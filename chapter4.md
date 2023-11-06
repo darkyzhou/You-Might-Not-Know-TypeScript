@@ -269,6 +269,10 @@ type DoCheck<T, U> = IsEqual<T, U> extends true
 
 > Decorator function return type is 'MyTypeError<"Type of parameter is not equal to type of decorator">' but is expected to be 'void' or 'any'.
 
+如果 TypeScript 能够帮帮忙，引入一种能够在 type 定义中被编译器检测的特殊类型作为报错信息的直接来源，我们还能得到更加直观的错误信息，例如：
+
+> The type of parameter is not equal to the type of decorator
+
 ### 关于新装饰器的讨论
 
 对于从 5.0 版本开始支持的新装饰器提案来说，它并不支持装饰声明在构造函数中的类成员变量：
