@@ -4,7 +4,7 @@
 
 ---
 
-# 基础知识
+# 第一章：基础知识
 
 ## 关于 TypeScript
 
@@ -103,7 +103,7 @@ const a: Foo = { bar: "Hello" };
 不过，结构化类型赋予了 TypeScript 的类型系统非常强大的功能，让我们可以通过编程的方式「组合」出自己想要的类型，这一点在后续的类型编程中会详细讨论。
 
 > [!NOTE]
-> 虽然我们说 TypeScript 的类型系统采用了结构化类型，但这不是绝对的。在一些细节上，它采用了名义类型，比如对于 `class` 中使用 `private` 或 `protected` 修饰的属性：https://github.com/microsoft/TypeScript/wiki/FAQ#when-and-why-are-classes-nominal。
+> 虽然我们说 TypeScript 的类型系统采用了结构化类型，但这不是绝对的。在一些细节上，它采用了名义类型，比如对于 `class` 中使用 `private` 或 `protected` 修饰的属性：[https://github.com/microsoft/TypeScript/wiki/FAQ#when-and-why-are-classes-nominal](https://github.com/microsoft/TypeScript/wiki/FAQ#when-and-why-are-classes-nominal)。
 >
 > 此外，我们会在后文看到，仍然可以通过一些特殊的手段在 TypeScript 的类型系统中模拟出名义类型的效果，来达到一些需要名义类型才能实现的目的。
 
@@ -154,7 +154,7 @@ TypeScript 提供的自动化检查对于团队协作来说是一个可扩展（
 - 如果一个类型是全集，那么其它所有类型都是它的子类型
 - 如果一个类型是空集，那么它是其它所有类型的子类型
 
-在 TypeScript 对赋值语句 `a = b` 进行类型检查时，它会检查 `b` 的类型是不是 `a` 的子类型。如果 `a` 的类型是全集，那么这个赋值总是会通过检查。如果 a 的类型是空集，那么这个赋值总是无法通过检查。对应到具体的类型来说，上述的「全集」指的是 `any` 和 `unknown` 而「空集」指的是 `never。`
+在 TypeScript 对赋值语句 `a = b` 进行类型检查时，它会检查 `b` 的类型是不是 `a` 的子类型。如果 `a` 的类型是全集，那么这个赋值总是会通过检查。如果 a 的类型是空集，那么这个赋值总是无法通过检查。对应到具体的类型来说，上述的「全集」指的是 `any` 和 `unknown` 而「空集」指的是 `never`。
 
 如果使用箭头表示类型的父子关系，可以得到下面的这张图：
 
@@ -238,7 +238,7 @@ const __: Vector1D = _2; // OK
 | 某个值可以被赋给（is assignable to）类型 `T`                                                                                                     |    $$Value \in T$$    |
 | 类型 `A` 可以被赋给（is assignable to）类型 `B`                                                                                                  |   $$A \subseteq B$$   |
 | 类型 `A` 是类型 `B` 的子类型                                                                                                                     |   $$A \subseteq B$$   |
-| A extends B，其中 A 和 B 为某种类型 <br />这个指的不是类继承语法哦                                                                               |   $$A \subseteq B$$   |
+| A extends B，其中 A 和 B 为某种类型（这个指的不是类继承语法哦）                                                                               |   $$A \subseteq B$$   |
 | `A \| B`，其中 A 和 B 为某种类型 这个概念被称为联合类型（union types） |     $$A \cup B$$      |
 | `A & B`，其中 A 和 B 为某种类型 这个概念被称为交叉类型（intersection types）                                                                     |     $$A \cap B$$      |
 
@@ -349,7 +349,7 @@ myApi(['foo', false]);
 「钻研」的客体如下图所示，它们会贯穿全文。~~这个图看上去有点像某个国产手机的镜头模组~~。
 
 <p align="center">
-  <img src="./assets/chapter1/research.png" width="250" />
+  <img src="./assets/chapter1/research.png" width="350" />
 </p>
 
 > [!NOTE]

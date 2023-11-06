@@ -4,7 +4,7 @@
 
 ---
 
-# 进阶话题
+# 第二章：进阶话题
 
 ## [声明合并（Declaration Merging）](https://www.typescriptlang.org/docs/handbook/declaration-merging.html)
 

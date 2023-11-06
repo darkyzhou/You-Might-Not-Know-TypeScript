@@ -4,7 +4,7 @@
 
 ---
 
-# 探索之路
+# 第五章：探索之路
 
 本章节将介绍一些和 TypeScript 相关的资料、书籍和类型库，希望能够帮助你继续在 TypeScript 的道路上探索下去。
 
@@ -30,7 +30,6 @@ TypeScript 前开发者 Orta Therox 的一个关于 TypeScript 编译器实现�
 - 语言服务的部分介绍
 - 源码调试技巧、开发流程介绍
 
-> [!NOTE]
 > Fun fact：我们在使用 TypeScript 的过程中遇到的绝大多数类型报错都来自一个名为 `checker.ts` 的源文件提供的类型检查能力。截至 2023 年 10 月 15 日，这个源文件有 50463 行！
 
 阅读 TypeScript 的源码可能不是简单的，因为它涉及了太多、太复杂的概念（请思考这个事实：TypeScript 的历史已经超过了 13 年）。一种效率较高的「理解 TypeScript 如何工作」的方式可能是：
@@ -53,31 +52,10 @@ TypeScript 的纪录片，比较有看点的地方：
 
 关于 TypeScript 的书籍，我能找到的似乎都是一些内容偏向基础的书籍。它们讨论的内容并不会像本文那样深入（或者说硬核），也许是因为这些知识不太成体系，并且大多属于经验之谈（尽管有一定的源码和文档支撑）。
 
-### Effective TypeScript
-
-<img src="./assets/chapter5/effective_typescript.png" style="zoom: 25%;" />
-
-提供了 62 种改善 TypeScript 使用技巧的方式，让你摆脱一些关于 TypeScript 的常见误用。
-
-书中还讨论了 TypeScript 的许多并没有在文档中介绍得清楚的机制，例如 Type Narrowing 和 Type Widening，帮助你理清 TypeScript 的一些设计原则和机制细节。
-
-总的来说，这是一本在闲暇之余可以读读看的好书。
-
-> 此书第一版发布于 2019 年底，至今已经接近 4 年，在这个过程中 TypeScript 已经发生了很多新的改变。书中讨论的一些问题已经有了更好、更现代的解法，可以参考本文章来形成互补。
-
-### Learning TypeScript
-
-<img src="./assets/chapter5/learning_typescript.png" style="zoom:25%;" />
-
-补充 TypeScript 基础知识的好书，涵盖了很多 TypeScript 官方文档没有涉及或讲得不多的内容，尤其是其中的：
-
-- 关于泛型的各种机制的介绍
-- 对 declaration files（声明文件，即 d.ts 文件）的介绍
-- 对 TypeScript 的配置项（特别是 tsconfig）的介绍
-
-> 本书的发布日期非常新，于 2022 年 7 月发行第二版，可以说是目前入门 TypeScript 的首选好书。
-
-有趣的是，这两本书的封面都是鸟，也许可以把它们合称为「两本鸟书」。
+| **Effective TypeScript** | **Learning TypeScript** |
+| :------------- | :----------: |
+| <img src="./assets/chapter5/effective_typescript.png" width="200" /><br />提供了 62 种改善 TypeScript 使用技巧的方式，让你摆脱一些关于 TypeScript 的常见误用。书中还讨论了 TypeScript 的许多并没有在文档中介绍得清楚的机制，例如 Type Narrowing 和 Type Widening，帮助你理清 TypeScript 的一些设计原则和机制细节。<br />总的来说，这是一本在闲暇之余可以读读看的好书。<br />注意：此书第一版发布于 2019 年底，至今已经接近 4 年，在这个过程中 TypeScript 已经发生了很多新的改变。书中讨论的一些问题已经有了更好、更现代的解法，可以参考本文章来形成互补。 | <img src="./assets/chapter5/learning_typescript.png" width="200" /><br />补充 TypeScript 基础知识的好书，涵盖了很多 TypeScript 官方文档没有涉及或讲得不多的内容，尤其是其中的：<br />- 关于泛型的各种机制的介绍<br />- 对 declaration files（声明文件，即 d.ts 文件）的介绍<br />- 对 TypeScript 的配置项（特别是 tsconfig）的介绍<br />本书的发布日期非常新，于 2022 年 7 月发行第二版，可以说是目前入门 TypeScript 的首选好书。 |
+---
 
 ## 类型库
 

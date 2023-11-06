@@ -4,7 +4,7 @@
 
 ---
 
-# 类型编程
+# 第三章：类型编程
 
 进阶话题中的内容远远不是 TypeScript 强大的类型系统的全部。还记得[类型系统的目的](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E7%9A%84)说过的，TypeScript 的设计目标之一是为「结构」提供检查手段吗？我们已经在进阶话题中讨论了很多检查手段，不过它们大多都只是直接基于类型系统提供的原语实现的。事实上，这套类型系统还能构造出更加复杂的检查手段，而它们才真正代表了 TypeScript 的上限。
 
@@ -30,7 +30,7 @@ declare function foo<T>(arg: T): void;
 > [!NOTE]
 > 如果你熟悉函数式编程（functional programming），你可能会觉得这里使用「变量」一词并不贴切。
 >
-> TypeScript 的类型系统在形式上更接近函数式语言而不是命令式语言，而在函数式语言中严格来说并不存在大多数人理解的「变量」这种说法，所有的运算都是通过[λ 演算（λ-calculus）](https://en.wikipedia.org/wiki/Lambda_calculus)表达的。不过，由于我猜测大多数阅读这篇文章的人相比函数式编程更熟悉传统的命令式编程，所以在这整一节中我都会使用更加偏向命令式编程的比喻修辞。
+> TypeScript 的类型系统在形式上更接近函数式语言而不是命令式语言，而在函数式语言中严格来说并不存在大多数人理解的「变量」这种说法，所有的运算都是通过 [λ 演算（λ-calculus）](https://en.wikipedia.org/wiki/Lambda_calculus)表达的。不过，由于我猜测大多数阅读这篇文章的人相比函数式编程更熟悉传统的命令式编程，所以在这整一节中我都会使用更加偏向命令式编程的比喻修辞。
 
 ### 类型中的泛型
 
@@ -268,33 +268,7 @@ type LengthOfString<S extends string, T extends never[] = []> =
 type FlatArray<Arr, Depth extends number> = {
   done: Arr;
   recur: Arr extends ReadonlyArray<infer InnerArr>
-    ? FlatArray<
-        InnerArr,
-        [
-          -1,
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20
-        ][Depth]
-      >
+    ? FlatArray<InnerArr, [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]>
     : Arr;
 }[Depth extends -1 ? "done" : "recur"];
 ```
