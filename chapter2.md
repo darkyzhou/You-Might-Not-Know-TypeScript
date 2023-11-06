@@ -1,6 +1,12 @@
-## 进阶话题
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第一章：基础知识](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第三章：类型编程](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md) |
 
-### [声明合并（Declaration Merging）](https://www.typescriptlang.org/docs/handbook/declaration-merging.html)
+---
+
+# 进阶话题
+
+## [声明合并（Declaration Merging）](https://www.typescriptlang.org/docs/handbook/declaration-merging.html)
 
 在 TypeScript 中，一个「声明」实际上会包含下列至少一种概念的声明：
 
@@ -47,7 +53,7 @@ type _4 = (typeof Foo)["baz"];
 
 类似地，如果一个名称指向一个变量声明，我们需要通过 `typeof` 来获得它指向的值类型（尽管这个名称只声明了一个值，并没有声明命名空间和类型）。
 
-#### `interface` 的声明合并
+### `interface` 的声明合并
 
 TypeScript 中同一个模块下的同名 `interface` 声明会被合并。例如，下面的两段代码是等价的。
 
@@ -97,7 +103,7 @@ interface Array<T> {
 
 当我们在配置文件中将目标（target）设置为了 `ES2019` 或更新的版本时，TypeScript 就会自动引入这个定义文件，为已有的数组类型定义（定义在更老的 ECMAScript 版本的类型文件中）扩充数组的类型定义。这就是为什么当调整目标之后，自动补全能够获得更多的提示。此外，这项特性还会被后文要介绍的其它进阶话题所使用。
 
-#### 命名空间的声明合并
+### 命名空间的声明合并
 
 命名空间除了能够和自身进行合并外，还能够和同名的类、函数或枚举声明进行合并，向这个名字指代的值定义中扩充更多的值。在下面的例子中，我们通过将命名空间和类声明进行合并，从而构造出了一个「内部类」定义：
 
@@ -152,7 +158,7 @@ namespace Color {
 }
 ```
 
-#### 模块扩充（Module Augmentation）
+### 模块扩充（Module Augmentation）
 
 模块扩充指的是这样一种机制：在不同的模块（或源文件）中对其它模块（或源文件）的类型定义通过进行扩充。特别地，通过 `declare global` 可以向全局空间扩充类型定义，就像下面的例子一样。
 
@@ -213,22 +219,17 @@ o.map((x) => x.toFixed());
 
 我们会在生产实践中看到更多有关模块扩充的使用例子。
 
-### 元组（Tuple）
+## 元组（Tuple）
 
 在 TypeScript 的类型系统中，元组是具有固定长度的有序数组。这意味着下面的特性：
 
-- 访问类型的 `length` 属性会获得数字字面量类型
-  ![img](./assets/chapter2/tuple_length.png)
+访问类型的 `length` 属性会获得数字字面量类型 | 直接使用下标访问元素会被类型检查 | 作为参数类型时，不会接受数组值，也不会接受长度不对的数组字面量
+:-------------------------:|:-------------------------:|:-------------------------:
+![](./assets/chapter2/tuple_length.png) | ![](./assets/chapter2/tuple_index.png) | ![](./assets/chapter2/tuple_argument.png) |
 
-- 直接使用下标访问元素会被类型检查
-  ![img](./assets/chapter2/tuple_index.png)
+TypeScript 还提供了一些特殊的功能，让元组类型发挥着独特的作用。
 
-- 作为参数类型时，不会接受数组值，也不会接受长度不对的数组字面量
-  ![img](./assets/chapter2/tuple_argument.png)
-
-TypeScript 还提供了一些特殊的设计，让元组类型发挥着独特的作用。
-
-#### [具名元组元素（Labeled Tuple Elements）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#labeled-tuple-elements)`4.0+`
+### [具名元组元素（Labeled Tuple Elements）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#labeled-tuple-elements)`4.0+`
 
 从 TypeScript 4.0 开始，可以为元组的元素赋予名称，就像下面的例子一样：
 
@@ -238,13 +239,15 @@ type Foo = [first: number, second?: string, ...rest: any[]];
 
 除了能够传达各个元素用作何用的信息之外，它还能在被作为函数的 [Rest Parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 时将名称传递为函数参数名：
 
-![img](./assets/chapter2/named_tuple.gif)
+<p align="center">
+  <img src="./assets/chapter2/named_tuple.gif" width="600" />
+</p>
 
-#### [可变元组类型（Variadic Tuple Types）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#variadic-tuple-types) `4.0+`
+### [可变元组类型（Variadic Tuple Types）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html#variadic-tuple-types) `4.0+`
 
 同样是从 TypeScript 4.0 开始，元组类型被赋予了可变的能力，它包含两个层面：展开语法（Spread syntax）支持泛型、剩余元素（Rest elements）可位于任意一项。
 
-##### 展开语法（Spread Syntax）支持泛型
+#### 展开语法（Spread Syntax）支持泛型
 
 在元组类型中出现的展开语法，如果作用于一个泛型类型（需要约束为数组或元组类型），那么它可以在类型推导时被推导为元组类型。下面是一个例子：
 
@@ -264,15 +267,16 @@ const _2 = tail([...myTuple, ...myArray] as const);
 //    ^? const _2: [2, 3, 4, ...string[]]
 ```
 
-**为什么 `tail` 函数泛型 `T` 的约束需要使用 `readonly unknown[]`？**
+> [!NOTE]
+> **为什么 `tail` 函数泛型 `T` 的约束需要使用 `readonly unknown[]`？**
+>
+> 在 TypeScript 的类型系统中，只读数组（readonly array）实际上是可变数组（mutable array，即不加 `readonly` 的数组类型）的父类型。根据[接口隔离原则（Interface segregation principle)](https://en.wikipedia.org/wiki/Interface_segregation_principle)，`tail` 函数不会对输入的数组做任何修改，它只依赖数组的只读接口（访问下标等），因此我们最好显式地声明这一点。这样，用户通过 `as const` 获得的只读数组也可以传入函数。
+>
+> 如果将 `T` 约束为 `unknown[]`，用户不仅无法传入只读数组，也可能被误导，认为我们的函数会修改数组内容，从而防御性地传入了一份数组的拷贝（例如，`tail([...myArray])`），这样做通常是不必要的。
+>
+> 更一般地，`readonly` 关键字以及它背后的理念能够辅助程序员对函数接口的合约（contract）进行建模，帮助我们写出更为严谨可靠的代码。它不仅能够像上面那样作用于数组，也能够作用于一般的对象。可惜的是，它并没有得到太多人的关注。
 
-在 TypeScript 的类型系统中，只读数组（readonly array）实际上是可变数组（mutable array，即不加 `readonly` 的数组类型）的父类型。根据[接口隔离原则（Interface segregation principle)](https://en.wikipedia.org/wiki/Interface_segregation_principle)，`tail` 函数不会对输入的数组做任何修改，它只依赖数组的只读接口（访问下标等），因此我们最好显式地声明这一点。这样，用户通过 `as const` 获得的只读数组也可以传入函数。
-
-如果将 `T` 约束为 `unknown[]`，用户不仅无法传入只读数组，也可能被误导，认为我们的函数会修改数组内容，从而防御性地传入了一份数组的拷贝（例如，`tail([...myArray])`），这样做通常是不必要的。
-
-更一般地，`readonly` 关键字以及它背后的理念能够辅助程序员对函数接口的合约（contract）进行建模，帮助我们写出更为严谨可靠的代码。它不仅能够像上面那样作用于数组，也能够作用于一般的对象。可惜的是，它并没有得到太多人的关注。
-
-##### 剩余元素（Rest Elements）可位于任意一项 `4.2+`
+#### 剩余元素（Rest Elements）可位于任意一项 `4.2+`
 
 过去，剩余元素只能位于元组的最后一项，限制了它能够发挥的作用。现在，可以做到类似下面这样的事情：
 
@@ -320,9 +324,9 @@ const _4 = concat([1] as const, ["foo"] as const);
 
 这样，我们就能在用户传入元组时得到元组类型，而不是数组类型。
 
-#### 工具函数 `asTuple` `5.0+`
+### 工具函数 `asTuple` `5.0+`
 
-我们还能够扩展上述的 `concat` 函数，注意其中的变量 `_1`、`_2` 和 `_4`，为什么非得使用 `as const` 才能让 TypeScript 推导出字面量类型呢？实际上，我们可以通过 ` const 类型参数（const type parameters）` `5.0+` 来改进这一点，让用户无需使用 `as const` 就能让 TypeScript 推导出元组字面量类型：
+我们还能够扩展上述的 `concat` 函数，注意其中的变量 `_1`、`_2` 和 `_4`，为什么非得使用 `as const` 才能让 TypeScript 推导出字面量类型呢？实际上，我们可以通过 [`const` 类型参数（`const` type parameters）](TODO) `5.0+` 来改进这一点，让用户无需使用 `as const` 就能让 TypeScript 推导出元组字面量类型：
 
 ```typescript
 declare function concat<
@@ -343,7 +347,7 @@ const _4 = concat([1] as const, ["foo"] as const);
 //    ^? const _4: [1, "foo"]
 ```
 
-更一般地，我们介绍一个工具函数 `asTuple`，它能够利用上述特性实现将给定的元组字面量推导为对应的元组字面量类型，注意它和 `as const` 的区别：
+更一般地，这里介绍一个工具函数 `asTuple`，它能够利用上述特性实现将给定的元组字面量推导为对应的元组字面量类型，注意它和 `as const` 的区别：
 
 ```typescript
 function asTuple<const T extends unknown[]>(input: [...T]) {
@@ -360,7 +364,7 @@ const _2 = [1, "foo"] as const;
 > [!NOTE]
 > 一般来说不必担心多了一个函数调用带来的 overhead，因为 minifier 很多时候都会自动去掉。不过我还没有调查过在跨模块调用的场景下类似的效果是否还会发生。
 
-### [模板字面量类型（Template Literal Types）](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html) `4.1+`
+## [模板字面量类型（Template Literal Types）](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html) `4.1+`
 
 从 TypeScript 4.1 开始，字符串字面量类型（string literal types）可以用来构造其它字符串字面量类型。具体的构造方法和 JavaScript 的模板字符串（template literals）类似，如下面的例子所示：
 
@@ -392,7 +396,7 @@ const _0: StartsWithNumber = "seele";
 const _1: StartsWithNumber = "114514_seele";
 ```
 
-#### 在联合类型（Union Types）中使用
+### 在联合类型（Union Types）中使用
 
 一些人可能不知道的是，上述的插值并非只能使用单个的字符串字面量类型，联合类型也是可被接受的。此时，TypeScript 会对模板字面量类型做联合类型运算，这个过程可以被理解为对联合类型等价的集合做笛卡尔积运算：
 
@@ -404,7 +408,7 @@ type Alignment = `${VerticalAlignment}-${HorizontalAlignment}`;
 //   ^? type Alignment = "top-left" | "top-center" | "top-right" | "middle-left" | "middle-center" | "middle-right" | "bottom-left" | "bottom-center" | "bottom-right"
 ```
 
-#### 在条件类型（Conditional Types）中使用
+### 在条件类型（Conditional Types）中使用
 
 ```typescript
 // 检查是否以 Seele 结尾
@@ -416,9 +420,9 @@ type _2 = "Test (foo) bar" extends `${string}(${infer T})${string}` ? T : never;
 //   ^? type _2 = "foo"
 ```
 
-我们会在后文对条件类型进行详细的讨论。
+我们会在[后文](TODO)对条件类型进行详细的讨论。
 
-#### 映射类型中键的重映射（Key Remapping in Mapped Types）
+### 映射类型中键的重映射（Key Remapping in Mapped Types）
 
 我们可以在映射类型（mapped types）中使用额外的 `as` 关键字来重命名构造的属性的名称。
 
@@ -449,9 +453,9 @@ type LazyPerson = Getters<Person>;
 > - 当 `K` 满足 `string` 类型时，结果为 `K` 对应的字符串字面量类型
 > - 否则，结果为 `never`，映射类型会过滤掉类型为 `never` 的键
 
-### 枚举（Enum）
+## 枚举（Enum）
 
-#### 常值枚举（Const Enum）
+### 常值枚举（Const Enum）
 
 常值枚举具有和一般的枚举显著不同的特点：对它的成员的引用会被内联（inline）到使用处（caller site）。请看下面的对比。
 
@@ -487,23 +491,23 @@ console.log(2 /* MyEnum.Baz */);
 
 对于常值枚举，注意到它并没有像一般的枚举那样在编译产物中留下对象的定义，而是直接将它的值内联到使用它的地方。常值枚举的这种特点可以大大减少枚举在编译产物中占据的体积，也能够带来一定的运行时性能提升。
 
-##### 局限性
+#### 局限性
 
 由于常值枚举的特性，它不能像一般的枚举那样使用[计算成员（computed member）](https://www.typescriptlang.org/docs/handbook/enums.html#computed-and-constant-members)。
 
 换句话说，常值枚举的成员的值只能通过下面任一方式得到：
 
-1. 作为枚举的第一个成员没有使用初始化语句（initializer）
+- 作为枚举的第一个成员没有使用初始化语句（initializer）
 
-> 此时，它会被赋予默认值 `0`
+  > 此时，它会被赋予默认值 `0`
 
-2. 没有使用初始化语句（initializer），而且在它前面的成员都被赋予了数字常量作为值
+- 没有使用初始化语句（initializer），而且在它前面的成员都被赋予了数字常量作为值
 
-> 此时，它会被赋予前一个成员的值加上 `1`
+  > 此时，它会被赋予前一个成员的值加上 `1`
 
 - 常量表达式的计算，包括字符串字面量等，具体请见[官方文档](https://www.typescriptlang.org/docs/handbook/enums.html#computed-and-constant-members)
 
-##### 不推荐在共享库中使用
+#### 不推荐在共享库中使用
 
 由于常值枚举的内联特性，TypeScript 不推荐在共享库（包括 `d.ts` 文件）中使用使用它，因为[它会导致一些问题](https://www.typescriptlang.org/docs/handbook/enums.html#const-enum-pitfalls)，特别是下面的版本问题：
 
@@ -511,7 +515,7 @@ console.log(2 /* MyEnum.Baz */);
 
 当然，如果你只是在终端项目里使用常值枚举，并且自己的包不会被其它项目共享，那么上述问题一般不会出现。
 
-##### 在模块扩充中使用
+#### 在模块扩充中使用
 
 还记得我们在[模块扩充](TODO)讨论过的，模块扩充一般用来为现有的类型扩充类型定义，但是不能为它扩充值吗？实际上由于常值枚举的内联特性，我们可以使用对常值枚举使用模块扩充，此时能够实现「扩充值定义」的效果。
 
@@ -547,7 +551,7 @@ console.log(Registry.Foo);
 >
 > 类似的问题也可能存在于命名空间上，如果你在多个源文件中扩充了同一个命名空间的定义，你必须确认编译产物符合预期。
 
-#### [枚举是联合类型](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html#all-enums-are-union-enums) `5.0+`
+### [枚举是联合类型](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html#all-enums-are-union-enums) `5.0+`
 
 从 TypeScript 5.0 开始，包括计算成员（computed member）在内的所有枚举成员都称为了独立类型。这意味着从此之后，一个枚举定义在类型定义的层面上实际上是一个由它的各个枚举成员对应的独立类型构成的联合类型。回忆我们在声明合并中的讨论，我们可以通过直接引用枚举定义的名字来引用它指向的类型定义。
 
@@ -555,7 +559,7 @@ console.log(Registry.Foo);
 
 这一特性带来了下面的一些有用的场景。
 
-##### 在模板字面量中使用枚举类型
+#### 在模板字面量中使用枚举类型
 
 ```typescript
 const enum MyEnum {
@@ -578,7 +582,7 @@ type _1 = `${AnotherEnum}`;
 // 所以最终计算得到的字符串类型为 string
 ```
 
-##### 精细的类型检查
+#### 精细的类型检查
 
 枚举成员的类型就是它被赋予的值的类型，比如下面的 `MyEnum` 的类型实际上等价于 `'foo' | 'bar' | 'baz'`。不过对于计算成员（computed member），它的类型一般不会是字面量类型，而是对应的父类型。
 
@@ -594,11 +598,11 @@ const _1: MyEnum = "bar"; // OK
 const _2: MyEnum = "xxx"; // ERROR!
 ```
 
-### 名义类型（Nominal Typing）
+## 名义类型（Nominal Typing）
 
 还记得文章开头有关[结构化类型和名义类型之间区别](TODO)的讨论吗？在名义类型中，如果函数的入参是某种特定类型，那么我们就必须通过一定的手段构造出这个类型的值才能输入给函数。在实践中，名义类型的这种对 API 用户侧提供约束的功能有着它独特的用武之地。包括约束功能在内，名义类型有着多种特殊用法。
 
-#### 在现有类型上施加约束
+### 在现有类型上施加约束
 
 假设我们想引入一系列 API，而且它们仅接受正数作为入参。传统的实践可能是在 API 的各个函数中重复地检查入参是否为正数。这种实践的扩展性很差，而且很容易引入多次不必要的检查。
 
@@ -636,7 +640,7 @@ doSomething(asPositiveValue(123)); // 不报错
 >
 > 在 JavaScript 中数组和对象的引用是可以被随意共享的，并没有好的办法保证某个数组或者对象在某个时刻只存在一个引用。这就导致了如果你使用其中一个引用通过了类似 `asPositiveValue` 的名义类型转换，其它代码却可能通过它持有的那份引用修改了对象内部的属性，破坏了名义类型本身的约束。我们将在关于[非空数组的讨论](TODO)中继续这个话题。
 
-#### 附加元信息
+### 附加元信息
 
 名义类型也可以用在给某个现有的类型附加一些「元信息」，这些元信息可以是泛型参数，也可以是字符串、数组等类型，用来给和它相关的函数的类型检查提供信息。在下面的例子中，我们通过给字符串附加一个泛型参数让它携带了这个字符串对应的依赖注入值的类型信息。
 
@@ -656,7 +660,7 @@ const userService = inject(USER_SERVICE);
 //    ^? const userService: UserService | null
 ```
 
-#### 阻止 Type Alias Preservation
+### 阻止 Type Alias Preservation
 
 当我们使用一些复杂的联合类型时，由于 [4.2 版本引入的 Smarter Type Alias Preservation 特性](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-2.html#smarter-type-alias-preservation)，TypeScript 不会展开这些联合类型。正如下面的例子，很难看出这个类型具体是哪些类型的联合。
 
@@ -674,7 +678,7 @@ type Bar = (Foo & {}) | 4 | 5;
 //   ^? type Bar = 1 | 2 | 3 | 4 | 5
 ```
 
-#### 阻止联合类型的 Subtype Reduction
+### 阻止联合类型的 Subtype Reduction
 
 当使用联合类型声明一些字面量类型和它对应的父类型（比如 `'foo'` 和 `string`）时，TypeScript 会将联合类型中的 `'foo'` 约去，因为这个字面量类型是它的子类型，而且它的值可以覆盖 `'foo'`。这个过程被称为 subtype reduction。
 
@@ -692,11 +696,11 @@ declare function foo(input: "a" | "b" | (string & {})): void;
 
 > 即将推出的 TypeScript 5.3 版本可能会解决上述问题，使得我们不需要再使用 `& {}`。
 
-### 控制流中的类型具化
+## 控制流中的类型具化
 
 TypeScript 在对源码的控制流分析中可能会施加[类型具化](TODO)，运用好这个特性能够帮助简化代码，以及提供类型检查。
 
-#### Discriminated Union Types
+### Discriminated Union Types
 
 一种很常见的场景是，我们有一个对象值，它满足且只满足若干个 `interface` 定义的其中一个。同时，我们需要在代码中区分这个对象值究竟满足的是哪个 `interface` 定义。就像下面的例子一样：
 
@@ -752,7 +756,7 @@ function myFunction(value: Apple | Banana | Watermelon) {
 }
 ```
 
-#### Exhaustive Guard（Exhaustive Check）
+### Exhaustive Guard（Exhaustive Check）
 
 在实践中，我们经常会对某个枚举值或者联合类型值进行特化处理，就像下面的代码这样。
 
@@ -804,11 +808,11 @@ switch (someValue) {
 }
 ```
 
-### 类型系统至暗时刻
+## 类型系统至暗时刻
 
 TypeScript 的类型系统不是完美的，在一些场景下它需要程序员去配合它才能正常工作。可是许多不耐烦的程序员总是倾向于通过一些强硬的手段让 TypeScript「闭嘴」，通过一些「不安全」的办法绕过类型检查（我曾经也会这样！）。下面，我们将介绍一些比较常见的让 TypeScript 闭嘴的方式，注意它们是如何阻碍 TypeScript 进行类型检查，造成使类型错误逃逸到运行时的风险的。
 
-#### 滥用 `any`
+### 滥用 `any`
 
 > [!NOTE]
 > **回顾一下为什么 `any` 类型如此特殊！**
@@ -839,7 +843,7 @@ function myFunction(value: any) {
 
 TypeScript 自带的类型库，特别是 `JSON.parse` 和 `fetch.json()` 的返回值都使用了 `any` 类型，饱受许多人的诟病。一些[工具类型库](https://github.com/total-typescript/ts-reset)会将它们修补为 `unknown` 类型。
 
-#### 滥用类型断言（Type Assertion）
+### 滥用类型断言（Type Assertion）
 
 [类型断言](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions)，包括 `as` 关键字在内，是 TypeScript 中又一个受到了大量滥用的功能。它的作用是将某个符号的类型进行*强制的 upcast 或 downcast*，让程序员可以为符号赋予一些 TypeScript 没能推导出来的类型。对它大多数滥用都将它当作了类似于声明变量时使用的 `variable: type` 这种手动标注类型的办法。
 
@@ -896,15 +900,16 @@ getElementById(elementId: string): HTMLElement | null;
 
 说到这里，我很倾向于告诉大家 **不要使用任何类型断言**，因为我几乎想不到它的任何安全的使用价值，除了[我们在名义类型中看到的用法](TODO)，以及作为某些细分场景下不得已的 workaround。如果你真的遇到了需要使用类型断言的场景，那么这说明你使用的 API 有问题，应该从源头修复问题而不是在另一端假装自己避开了问题。正如我们看到的，类型断言很容易成为一种掩耳盗铃的、自欺欺人的手段。
 
-就上面的 `getElementById()` 来说，我认为它的类型定义应该被修改为：
+> [!NOTE]
+> 就上面的 `getElementById()` 来说，我认为它的类型定义应该被修改为：
+>
+> ```typescript
+> getElementById<T extends HTMLElement = HTMLElement>(id: string): T | null;
+> ```
+>
+> 这样，用户既能够手动限定类型，又能够受到返回值可能为 `null` 的约束。
 
-```typescript
-getElementById<T extends HTMLElement = HTMLElement>(id: string): T | null
-```
-
-这样，用户既能够手动限定类型，又能够受到返回值可能为 `null` 的约束。
-
-#### 误用泛型
+### 误用泛型
 
 这里讨论一个常见的对泛型的误用：实例化（instantiate）某个泛型参数之后没有为它提供类型别名。
 
@@ -950,11 +955,11 @@ doSomething(otherModule.api.foo); // 不再需要类型断言！
 
 总的来说，一旦需要复用某些类型（特别是实例化后的泛型类型），我们都需要使用类型别名让这种类型称为一种「权威」，一种可供后续代码直接复用的东西。这些代码不应该承担「应该如何实例化泛型类型」的职责。
 
-### 一些零碎的技巧
+## 一些零碎的技巧
 
 本节会介绍一些零碎的 TypeScript 技巧，它们的内容不足以让它们成为单独的一节。
 
-#### `const` 类型参数（`const` Type Parameters） `5.0+`
+### `const` 类型参数（`const` Type Parameters） `5.0+`
 
 在声明函数中的泛型时，可以通过额外的 `const` 关键字来约束类型系统在类型推导时尽量使用字面量类型。目前，这种约束只对函数调用时直接写在括号中的字面量有效。
 
@@ -978,7 +983,7 @@ const names = getNamesExactly({ names: ["Alice", "Bob", "Eve"] });
 //    ^? const names: readonly ["Alice", "Bob", "Eve"]
 ```
 
-#### [Immediately Indexed Mapped Type（IIMT）](https://www.totaltypescript.com/immediately-indexed-mapped-type)
+### [Immediately Indexed Mapped Type（IIMT）](https://www.totaltypescript.com/immediately-indexed-mapped-type)
 
 这个技巧主要用于对一个联合类型进行迭代，进而构造出一个由对象类型构成的联合类型。它的基本形式如下：
 
@@ -1040,7 +1045,7 @@ type Example = {
 }[Event["type"]];
 ```
 
-#### 工具类型 `Prettify`
+### 工具类型 `Prettify`
 
 当我们写出一些复杂的对象类型时，TypeScript 的类型提示并不会显示它的实际内容（或者说，它展示的类型不够直观），这对使用这个类型造成了一定的困难，因为我们不能马上知道这个类型究竟具有哪些属性。
 
@@ -1065,7 +1070,7 @@ type TypeB = Prettify<{ a: TypeA } & { baz: number }>;
 //   ^? type TypeB = { a: { foo: number }; baz: number; }
 ```
 
-#### 非空数组（Non-Empty Array）
+### 非空数组（Non-Empty Array）
 
 在一些场景下，长度为 `0` 的数组（即空数组）是有害的，或者说严重违背了 API 的语义。在这种情况下，用户向 API 传入的空数组具有着类似 `undefined` 或者 `null` 那样的破坏力。考虑一个 `last` 函数，它接受一个数组作为参数，返回这个数组的末尾元素。从设计的角度来说，如何处理「用户可以输入空数组」这一事实呢？
 
@@ -1136,7 +1141,7 @@ last(nonEmptyArray);
 >
 > 总之，我们需要记住像非空数组这样「对数组或者对象使用名义类型」的方法并不是完全可靠的。在生产实践中应该事先思考清楚上面的问题再决定是否使用。
 
-#### [函数中的 this](https://www.typescriptlang.org/docs/handbook/2/functions.html#declaring-this-in-a-function)
+### [函数中的 this](https://www.typescriptlang.org/docs/handbook/2/functions.html#declaring-this-in-a-function)
 
 在 TypeScript 的函数类型定义中，我们实际上可以提供一个特殊的 `this` 参数，通过指定它的类型，可以指定在这个函数中 `this` 的指向。此时，用户若传入箭头函数，它的 `this` 仍然指向全局空间。
 
@@ -1158,7 +1163,7 @@ const admins = db.filterUsers(function () {
 
 特别地，可以通过将 `this` 的类型指定为 `never` 来阻止用户在函数中使用 `this`。
 
-#### 调用类型的函数
+### 调用类型的函数
 
 如果你检查过 `keyof string` 这个类型里面有什么，你会发现它会包含字符串对象里面的各种属性名。类型系统为各种基础类型都提供了它的实例通过原型链获得的可访问的属性。其中，类型系统还会将一些类型的个别属性具化为有用的字面量类型，[正如我们在元组中看到的那样](TODO)。
 
@@ -1173,3 +1178,9 @@ type _1 = GetParentTypeOf<number>;
 type _2 = GetParentTypeOf<123>;
 //   ^? type _2: number
 ```
+
+---
+
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第一章：基础知识](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第三章：类型编程](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md) |

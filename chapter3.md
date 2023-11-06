@@ -1,4 +1,10 @@
-## 类型编程
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第二章：进阶话题](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第四章：生产实践](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter4.md) |
+
+---
+
+# 类型编程
 
 进阶话题中的内容远远不是 TypeScript 强大的类型系统的全部。还记得[类型系统的目的](TODO)说过的，TypeScript 的设计目标之一是为「结构」提供检查手段吗？我们已经在进阶话题中讨论了很多检查手段，不过它们大多都只是直接基于类型系统提供的原语实现的。事实上，这套类型系统还能构造出更加复杂的检查手段，而它们才真正代表了 TypeScript 的上限。
 
@@ -6,7 +12,7 @@
 
 本节的故事会从 TypeScript 的类型系统本身开始，介绍它之所以具备图灵完备性所仰赖的几个关键功能。然后，我们会介绍如何通过函数来检查一些需要进行特殊检查的值。本节的话题被称为「类型编程」，因为我们将会看到，类型编程做的事情就是使用 TypeScript 的类型系统算出一个类型，然后检查传入的值是否满足这个类型。
 
-### [泛型（Generics）](https://www.typescriptlang.org/docs/handbook/2/generics.html)
+## [泛型（Generics）](https://www.typescriptlang.org/docs/handbook/2/generics.html)
 
 在 TypeScript 中，泛型被视为向类型系统中引入变量的手段，通过使用泛型我们可以在类型上下文中引入一些互相关联的类型。例如，在下面的 `sum` 函数中，通过引入泛型统一了函数的入参和返回值的类型。
 
@@ -26,7 +32,7 @@ declare function foo<T>(arg: T): void;
 >
 > TypeScript 的类型系统在形式上更接近函数式语言而不是命令式语言，而在函数式语言中严格来说并不存在大多数人理解的「变量」这种说法，所有的运算都是通过[λ 演算（λ-calculus）](https://en.wikipedia.org/wiki/Lambda_calculus)表达的。不过，由于我猜测大多数阅读这篇文章的人相比函数式编程更熟悉传统的命令式编程，所以在这整一节中我都会使用更加偏向命令式编程的比喻修辞。
 
-#### 类型中的泛型
+### 类型中的泛型
 
 在使用 `type`、`interface`、`class` 等关键字定义类型时，可以为类型引入泛型，泛型参数可以被理解为「构造这个类型所需要输入的变量」。带有泛型参数的类型定义就像一个函数，它接受其它类型作为入参，返回构造出来的类型。
 
@@ -46,11 +52,11 @@ function nullable(someType) {
 
 这种基于给定类型构造其它类型的过程是类型编程的基础之一，我们会在[后文](TODO)继续讨论这一点。
 
-#### 函数中的泛型
+### 函数中的泛型
 
 在声明函数时，我们也可以为函数引入泛型。不过，和类型中的泛型不同，函数中的泛型既可以手动指定也可以由 TypeScript 自动推导。而后者是利用 TypeScript 对值进行特殊的类型检查所依赖的底层能力。我们将马上在[后文](TODO)继续讨论这一话题。
 
-#### 泛型约束（Generic Constraints）
+### 泛型约束（Generic Constraints）
 
 通过对泛型参数使用 `extends` 关键字，可以限定这个泛型的类型范围，参见[类型是值的集合](TODO)。
 
@@ -74,7 +80,7 @@ check(foo(new LiteralStringType("seele")), () => "seele"); // OK
 check(foo(new LiteralStringType("seele")), () => "sirin"); // ERROR
 ```
 
-### [条件类型（Conditional Types）](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#handbook-content)
+## [条件类型（Conditional Types）](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#handbook-content)
 
 条件类型指的是一套机制，它根据输入类型是否满足给定条件，返回不同的类型作为结果。它具有下面的代码展示的形式。其中，若条件满足，`Result` 最终指向 `TrueType`；否则，指向 `FalseType`。
 
@@ -103,7 +109,7 @@ const _2 = createLabel(2.8);
 
 通过上面的例子我们可以看到，条件类型是 TypeScript 用来提供条件分支（conditional branch）的手段，这是人们之所以称它为图灵完备的原因之一。接下来，我们介绍条件类型的几个重要机制。
 
-#### `infer` 关键字
+### `infer` 关键字
 
 在通过条件类型判断输入类型是否满足给定条件（这本质上是检查它是否为目标类型的子类型）时，TypeScript 提供了 `infer` 关键字来让我们可以在这个过程中根据目标元素的泛型类型，提取出输入类型的额外信息。
 
@@ -181,7 +187,7 @@ type Foo<T extends string[]> =
 type Bar<T extends string> = // ...;
 ```
 
-#### [分配式条件类型（Distributive Conditional Types）](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types)
+### [分配式条件类型（Distributive Conditional Types）](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types)
 
 在通过 `extends` 关键字表达泛型的类型约束时，很多人都会忘记要检查的类型可能是联合类型这一事实。例如，对于 `T extends string`，实际上当 `T` 为 `'foo' | 'bar'` 时也是满足约束的。
 
@@ -201,7 +207,7 @@ type _2 = NoTwo<1 | 2 | 3>;
 //   ^? type _2 = 1 | 3
 ```
 
-#### [递归条件类型（Recursive Conditional Types）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#recursive-conditional-types)`4.1+`
+### [递归条件类型（Recursive Conditional Types）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#recursive-conditional-types)`4.1+`
 
 从 TypeScript 4.1 版本开始，我们可以像编写 JavaScript 代码一样，在类型定义中递归地调用自身。这使得像 `Awaited` 这样的工具类型得以以一种简单的形式实现（它现在是 TypeScript 自带的工具类型）。
 
@@ -218,7 +224,7 @@ type _3 = Awaited<Promise<Promise<"seele">>>;
 //   ^? type _3 = "seele"
 ```
 
-### 递归与循环
+## 递归与循环
 
 回忆起在大一刚刚开始学习程序设计的时候，我们在学完分支语句之后会学习什么？对啦，循环语句。循环语句也是图灵完备性的要素之一，而在 TypeScript 中实现循环语句的方法却有些曲折：通过递归实现循环。
 
@@ -299,7 +305,7 @@ type FlatArray<Arr, Depth extends number> = {
 
 因此，在使用递归时，为了减少资源占用和防止 TypeScript 报错，我们最好将递归步骤处理成满足尾递归的形式。从 TypeScript 4.5 开始，它会对递归类型做尾递归优化，这意味着当递归类型[满足一定条件](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-5.html#tail-recursion-elimination-on-conditional-types)时，即使递归层数极其深也不会导致出现大量的资源占用，TypeScript 也不会报错。
 
-#### 使用 `infer` 关键字遍历元组类型
+### 使用 `infer` 关键字遍历元组类型
 
 通过结合 `infer` 关键字，我们可以遍历一个元组类型。在下面的例子中：
 
@@ -322,7 +328,7 @@ type _2 = UppercaseArray<string[]>;
 //   ^? type _2 = []
 ```
 
-#### 使用 `infer` 关键字遍历字符串字面量类型
+### 使用 `infer` 关键字遍历字符串字面量类型
 
 对字符串字面量类型，我们也有类似的遍历方法。在下面的例子中：
 
@@ -352,7 +358,7 @@ type RemoveSpaces<T extends string> = string extends T // 👈 通过这种方�
   : "";
 ```
 
-#### 使用递归构造需要的类型
+### 使用递归构造需要的类型
 
 在下面的例子中，我们构造了一个和给定字符串长度相同的数组类型。
 
@@ -384,7 +390,9 @@ declare function uppercaseProMax<T extends string>(
 ): string;
 ```
 
-![img](./assets/chapter3/uppercase.gif)
+<p align="center">
+  <img src="./assets/chapter3/uppercase.gif" width="500" />
+</p>
 
 > [!NOTE]
 > 我们其实还能做得更好，下面的这些优化点你知道如何实现吗？
@@ -392,7 +400,7 @@ declare function uppercaseProMax<T extends string>(
 > - 当 `input` 不是一个字面量而是一个 `string` 类型的变量时，`WhichToUppercase` 返回了 `[]`，这显然是不合理的，应该回退为 `boolean[]`
 > - 当 `input` 为一个字面量时，返回值类型可以直接根据 `T` 和传入的 `whichToUppercase` 值的具体类型来计算得到。例如，当传入 `'foo'` 和 `[false, true, false]` 时，我们实际上可以计算出返回值类型应该为 `'fOo'` 而不是空泛的 `string`
 
-### 函数泛型
+## 函数泛型
 
 前文提到，在函数泛型中，泛型参数的具体类型可以依据输入的参数值和函数的返回值进行推导。这里暗含了类型编程的重要功能：函数泛型可以让 TypeScript 从某个值中推导出类型，然后我们可以继续对这个类型进行计算（就像在前文讨论过的，如何基于给定类型计算新的类型），并使用最终得到的类型反过来对值进行类型检查。
 
@@ -404,7 +412,7 @@ declare function uppercaseProMax<T extends string>(
 
 本节将提出一个使用函数泛型检查字面量是否满足某些约束的「通用方法」，这些字面量包括：字符串字面量、元组字面量、对象字面量。关于「某些约束」，这一方面取决于实际的需求，另一方面取决于 TypeScript 类型系统的上限以及程序员花费时间的意愿。我们假设读者愿意花费时间编写一些复杂的类型检查规则，那么剩下的问题就是类型系统是否能够满足需求，我们会在本节当中以及之后的生产实践提供一些例子来展示类型系统能做到什么。
 
-#### Type Parameter Inference
+### Type Parameter Inference
 
 在此之前，我们先来搞清楚 TypeScript 在检查带泛型参数的函数的调用语句时，具体发生了什么。考虑下面的代码，当我们传入的对象字面量中的 `initial` 函数返回了字符串类型的值时，TypeScript 将 `T` 推导为了 `string`。这个过程中发生了什么？
 
@@ -449,7 +457,7 @@ const _1 = setup({ initial() { return "seele"; } });
 
 根据上面的过程，可以得到 Type Parameter Inference 的一个可以好好利用的切入点：第三步中得到的 `T` 类型。这里的类型承载了用户传入的值的类型信息，或者说它充当了我们即将进行的类型编程的入口，接受的是用户的意图。根据 `T` 承载着的「意图」，我们可以结合本章前文讨论过的许多内容，在业务需求的基础上对 `T` 进行特殊处理，例如得到新的类型用于后续的类型检查或类型提示。
 
-#### 约束检查的通用方法
+### 约束检查的通用方法
 
 这里提出一个通过函数泛型对任意字面量施加特殊约束的通用方法。请区分「约束检查」和「类型检查」两个概念，前者是业务相关的、由我们施加的；后者是 TypeScript 自动执行的。当然，约束检查最终还是要由 TypeScript 通过类型检查来落实。
 
@@ -493,7 +501,7 @@ check({ foo: true, bar: false }); // ERROR
 
 上面的例子通过 `extends Record<string, unknown>` 向 `T` 附加约束，这能够作为 contextual type 在 Type Parameter Inference 期间为 TypeScript 提供更好的提示，让它计算出更准确（更接近对象类型）的候选。在一些简单场景下这不是必要的，我们一般在遇到了问题时才会这样做。
 
-##### 对比其它方案
+#### 对比其它方案
 
 由于通用方法是通过对传入值的整体进行约束检查，并在不通过时触发 TypeScript 的类型检查错误，所以当约束检查没有通过时，TypeScript 会对输入函数的整个值进行报错，你会看到红色下划线标记了传入的整个字面量。这在一些场合下并不理想，因为造成约束不通过的原因往往只是字面量定义里的很小一部分。
 
@@ -527,7 +535,7 @@ declare function check<T extends string[]>(
 
 我们还能通过下面的方法来改善通用方法提供的报错信息过于晦涩的问题。
 
-##### 定制报错信息
+#### 定制报错信息
 
 当需要进行约束检查的 `T` 是对象和元组类型时，可以通过[名义类型](TODO)提供「约束检查报错信息」。上面的例子可以改成下面这样，注意报错信息的末尾是如何展现我们提供的报错信息的。
 
@@ -548,9 +556,11 @@ check({}); // ERROR!
 
 基于名义类型，在检查其它类型例如字符串字面量类型时，依然能够通过类似的方法提供定制化的报错信息。如果你使用的 IDE 是 WebStorm，它提供的 TypeScript 报错信息会更加美观，就像下面的图片这样：
 
-![img](./assets/chapter3/report.png)
+<p align="center">
+  <img src="./assets/chapter3/report.png" width="350" />
+</p>
 
-##### 其它形式
+#### 其它形式
 
 除了将 `DoCheck<T>` 通过交叉类型附加到参数类型上，还能够将其作为返回值的类型实现约束检查。此时约束检查的报错信息将具有更直观的形式。总之，通用方法的关键是能够在尽量不干扰 Type Parameter Inference 的同时具备触发 TypeScript 的类型报错的能力。
 
@@ -567,11 +577,11 @@ check({}) satisfies never;
 // Type 'MyTypeError<"对象没有包含必须的类型 foo 哦">' does not satisfy the expected type 'never'
 ```
 
-#### 常用的匹配方法
+### 常用的匹配方法
 
 了解完通用方法之后，我们来讨论一下如何对 `T` 提供 TypeScript 想要的 contextual signature 和 contextual type，进而让 `T` 被推导为我们需要进行约束检查的类型。毕竟谁也不想在需要检查某个字符串字面量的时候，收到了 TypeScript 传过来的 `string` 类型，而不是字面量类型。
 
-##### 匹配元组类型 `4.0+`
+#### 匹配元组类型 `4.0+`
 
 我们已经在介绍[可变元组类型](TODO)时讨论过，可以使用 JavaScript 中的数组相关语法来匹配元组。下面是一些例子：
 
@@ -600,7 +610,7 @@ const _3 = test(["seele", 114, false]);
 //    ^? const _3: [string, number, boolean]
 ```
 
-##### 匹配对象类型
+#### 匹配对象类型
 
 我们已经在前文看到如何匹配对象中的特定属性了，接下来讨论的是如何匹配整个对象类型。
 
@@ -612,7 +622,7 @@ const _0 = getKeys({ bar: "seele", baz: 233 });
 //    ^? const _0: "bar" | "baz"
 ```
 
-##### 匹配字面量类型
+#### 匹配字面量类型
 
 通过为 `T` 附加对应字面量的父类型（或者说 apparent type）约束可以让 TypeScript 保持选择字面量类型而不是它的父类型。
 
@@ -632,9 +642,9 @@ const _1 = setup({ foo: "seele", bar: 114514, baz: true });
 //    ^? const _1: { readonly foo: "seele"; readonly bar: 114514; readonly baz: true; }
 ```
 
-#### 一些约束检查的例子
+### 一些约束检查的例子
 
-##### 确保字符串包含特定子串
+#### 确保字符串包含特定子串
 
 在下面的例子中，我们通过引入一个函数来对某个字符串字面量进行检查，查看它是否包含子串 `seele`。当不包含该子串时，通过将函数的参数类型设置为 `never` 来触发类型检查错误。
 
@@ -659,7 +669,7 @@ const _2 = check("seele, hello!");
 //    ^? const _2: "seele, hello!"
 ```
 
-##### 确保两个数组长度相同
+#### 确保两个数组长度相同
 
 为了简洁，这里没有考虑输入的数组不是元组类型而是数组类型的情况。
 
@@ -699,7 +709,7 @@ check3([], [1]); // ERROR
 check3([1], ["foo"]); // OK
 ```
 
-#### 函数类型闭包
+### 函数类型闭包
 
 除了能够实现约束检查，函数泛型还有一项重要的功能是：提供函数类型闭包。通过函数类型闭包，函数的泛型参数能够被传递到返回值类型中从而被保留下来。这和我们熟悉的 JavaScript 变量的闭包有些类似。
 
@@ -740,4 +750,10 @@ if (validatorFn(_0)) {
 }
 ```
 
-我们会在接下来的[生产实践](TODO)中介绍更多有关函数类型闭包的例子，进一步展现它的强大功能。
+我们会在接下来的生产实践章节中介绍更多有关函数类型闭包的例子，进一步展现它的强大功能。
+
+---
+
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第二章：进阶话题](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第四章：生产实践](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter4.md) |

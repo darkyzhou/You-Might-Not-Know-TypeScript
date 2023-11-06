@@ -1,3 +1,9 @@
+| **目录** | **下一章** |
+| :----------: | :------: |
+| [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第二章：进阶话题](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md)  |
+
+---
+
 # 基础知识
 
 ## 关于 TypeScript
@@ -152,15 +158,17 @@ TypeScript 提供的自动化检查对于团队协作来说是一个可扩展（
 
 如果使用箭头表示类型的父子关系，可以得到下面的这张图：
 
-<img src="./assets/chapter1/hierarchy.png" style="zoom: 25%;" />
+<p align="center">
+  <img src="./assets/chapter1/hierarchy.png" width="520" />
+</p>
 
 像 `any` 和 `unknown` 这样在整个类型系统中处于顶部位置（其它所有类型是它们的子集）的类型，被称为「top types」。而像 `never` 这样在整个类型系统中处于底部位置（它是其它所有类型的子集）的类型，被称为「bottom types」。谁框定的值更多谁就处于这个体系中更高的位置，反之则处于更低的位置。
 
 我们还有下面的讨论：
 
-- 当使用 string 标注变量时，我们是在表达「这个变量的值可能是任意一个字符串值」
-- 当使用 'foo' | 'bar' 标注变量时，我们是在表达「这个变量的值只能是 'foo' 或 'bar'」
-- null 和 undefined 类型有些特殊，它们都只框定了一个值，分别是 null 和 undefined
+- 当使用 `string` 标注变量时，我们是在表达「这个变量的值可能是任意一个字符串值」
+- 当使用 `'foo' | 'bar'` 标注变量时，我们是在表达「这个变量的值只能是 `'foo'` 或 `'bar'`」
+- `null` 和 `undefined` 类型有些特殊，它们都只框定了一个值，分别是 `null` 和 `undefined`
 
 ### 对象类型
 
@@ -179,8 +187,26 @@ interface Vector3D extends Vector2D {
   z: number;
 }
 ```
+<p align="center">
+  <img src="./assets/chapter1/subtypes.png" width="280" />
+</p>
 
-<img src="./assets/chapter1/subtypes.png" style="zoom:50%;" />
+特别地，TypeScript 不允许对一个对象字面量值进行 upcast：
+
+```typescript
+const _0: Vector1D = { x: 114, y: 514 };
+// ERROR: Object literal may only specify known properties, and 'y' does not exist in type 'Vector1D'
+```
+
+这倒不是在说前面的说法有问题，而是它就是一个附加的「特例」规则，这在一些场景下很有用（特别是向 React 组件传对象字面量参数时）。这个特例只发生在对象字面量值中，如果使用一些间接的方式赋值就不会报错：
+
+```typescript
+const _1: Vector2D = { x: 114, y: 514 };
+const _2: Vector2D = { x: 114, y: 514 };
+
+const _: Vector1D = _1; // OK
+const __: Vector1D = _2; // OK
+```
 
 > [!NOTE]
 > **类型 `{}` 到底是什么？**
@@ -189,13 +215,13 @@ interface Vector3D extends Vector2D {
 >
 > 事实上，从 TypeScript 4.8 开始，`{}` 等价于「任何非 `null` 且非 `undefined` 的类型」，并且有：`type NonNullable<T> = T extends null | undefined ? never : T` 等价于 ` T & {}`。换句话说，`string`、`number`、`boolean` 等常见类型也能够被赋给 `{}`。
 >
-> 因此，`{}` 框定的值的范围实际上要大于「任何对象类型」。如果确实想表示对象类型，Record<string, unknown> 一般会是更好的选择。
+> 因此，`{}` 框定的值的范围实际上要大于「任何对象类型」。如果确实想表示对象类型，`Record<string, unknown>` 一般会是更好的选择。
 
 ### Upcast 和 Downcast
 
 在 TypeScript 检查一个值是否可以被赋给（assign to）一个变量时，如果这个值的类型是变量类型的子类型，那么称这个过程为 upcast。例如将 `true` 赋给一个 `boolean` 类型的变量。根据里氏替换原则，这种 upcast 基本上是安全的，因此 TypeScript 不会对这种赋值语句做额外的要求。
 
-如果方向相反，变量的类型是值的子类型，这个过程则被称为 downcast。例如将 {} 赋给 { foo: string }。这种赋值并不安全，因此 TypeScript 在进行类型检查时会报错。我们一般需要通过类型断言（type assertion）去告诉 TypeScript 我们十分肯定这件事情是正确的，不过这也成为了 `as` 被滥用的开端，在后文会展开讨论。
+如果方向相反，变量的类型是值的子类型，这个过程则被称为 downcast。例如将 `{}` 赋给 `{ foo: string }`。这种赋值并不安全，因此 TypeScript 在进行类型检查时会报错。我们一般需要通过类型断言（type assertion）去告诉 TypeScript 我们十分肯定这件事情是正确的，不过这也成为了 `as` 被滥用的开端，在[后文](TODO)会展开讨论。
 
 > [!WARNING]
 > **不推荐使用 any 类型！**
@@ -206,16 +232,17 @@ interface Vector3D extends Vector2D {
 
 | TypeScript 概念                                                                                                                                  |    对应的集合概念     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------: |
-| `never`                                                                                                                                          | $$\emptyset$$（空集） |
+| `never`                                                                                                                                          | $$\emptyset（空集）$$ |
 | `unknown`                                                                                                                                        |         全集          |
 | 字面量，例如 `'foo'`                                                                                                                             |      单元素集合       |
 | 某个值可以被赋给（is assignable to）类型 `T`                                                                                                     |    $$Value \in T$$    |
 | 类型 `A` 可以被赋给（is assignable to）类型 `B`                                                                                                  |   $$A \subseteq B$$   |
 | 类型 `A` 是类型 `B` 的子类型                                                                                                                     |   $$A \subseteq B$$   |
 | A extends B，其中 A 和 B 为某种类型 <br />这个指的不是类继承语法哦                                                                               |   $$A \subseteq B$$   |
-| `A                                                                           \| B`，其中 A 和 B 为某种类型 这个概念被称为联合类型（union types） |     $$A \cup B$$      |
+| `A \| B`，其中 A 和 B 为某种类型 这个概念被称为联合类型（union types） |     $$A \cup B$$      |
 | `A & B`，其中 A 和 B 为某种类型 这个概念被称为交叉类型（intersection types）                                                                     |     $$A \cap B$$      |
 
+> [!NOTE]
 > 赋值（assignment）和子类型（subtype）具体检查的项目其实不完全等价。
 >
 > [TypeScript 的官方文档提到](https://www.typescriptlang.org/docs/handbook/type-compatibility.html#subtype-vs-assignment)，前者在后者的基础上扩展了两条规则：
@@ -251,11 +278,11 @@ TypeScript 在进行类型推导时存在两套特殊的机制：类型泛化（
 
 ##### 类型泛化（Type Widening）
 
-我们在编写 TypeScript 代码（甚至是纯 JavaScript 代码）时，在很多情况下不需要通过上述方法标注类型，因为 TypeScript 可以通过分析源代码去自动推断出类型。例如当写下 `let foo = 'bar'` 时，虽然我们并没有指出 `foo` 应该是 `string` 类型，但 TypeScript 能够依据它是变量声明语句以及它的 rhs 表达式（Right-hand side expression）是一个字符串字面量（string literal）等事实，来推导出一种「合适」的类型。
+我们在编写 TypeScript 代码（甚至是纯 JavaScript 代码）时，在很多情况下不需要通过上述方法标注类型，因为 TypeScript 可以通过分析源代码去自动推断出类型。例如当写下 `let foo = 'bar'` 时，虽然我们并没有指出 `foo` 应该是 `string` 类型，但 TypeScript 能够依据它是变量声明语句以及它的 rhs 表达式（right-hand side expression）是一个字符串字面量（string literal）等事实，来推导出一种「合适」的类型。
 
 不过，所谓的「合适」其实是一个复杂的话题。TypeScript 只能从源码上掌握有限的信息，有时并不能以此推断出程序员的意图。例如，我们经常在声明变量时遇到下面这样的两难问题（dilemma）：
 
-```TypeScript
+```typescript
 declare function myApi(someTuple: [string, boolean]): void;
 
 const firstTry = ['foo', false];
@@ -286,7 +313,7 @@ myApi(['foo', false]);
 
 - 通过感叹号判空
 
-  ```TypeScript
+  ```typescript
   const element = document.getElementById('#input');
   // 此时，element 类型为 HTMLElement | null
   if (!element) {
@@ -298,7 +325,7 @@ myApi(['foo', false]);
 
 - 通过 `instanceof` 判断类型
 
-  ```TypeScript
+  ```typescript
   declare const value: string | RegExp;
   if (value instanceof RegExp) {
     // 此时，value 类型为 RegExp
@@ -321,9 +348,16 @@ myApi(['foo', false]);
 
 「钻研」的客体如下图所示，它们会贯穿全文。~~这个图看上去有点像某个国产手机的镜头模组~~。
 
-<img src="./assets/chapter1/research.png" style="zoom: 25%;" />
+<p align="center">
+  <img src="./assets/chapter1/research.png" width="250" />
+</p>
 
 > [!NOTE]
 > 为了便于读者分辨某个特性被正式引入 TypeScript 的版本，我们在后文提及特性的地方使用了版本号进行标注。例如，当读者看到「`4.9+`」字样时，意味着这项特性在 TypeScript 的 4.9 版本被引入，并从这个版本开始可用。这些版本信息的标注可能不全面或者有错误，欢迎读者划线评论指出。
 
+---
+
+| **目录** | **下一章** |
+| :----------: | :------: |
+| [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第二章：进阶话题](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md)  |
 

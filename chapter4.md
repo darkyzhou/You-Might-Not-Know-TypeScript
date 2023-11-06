@@ -1,8 +1,14 @@
-## 生产实践
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第三章：类型编程](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第五章：探索之路](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter5.md) |
+
+---
+
+# 生产实践
 
 下面介绍一些使用了前文介绍的特性和技巧的实践，它们主要来源于我自己在工作中和私下里的项目中得到的灵感。
 
-### 类型安全的路由器
+## 类型安全的路由器
 
 这里的「路由器」不是指办公室墙上的那个，而是下面这种东西：
 
@@ -15,7 +21,7 @@ app.get("/users/:userId/books/:bookId", (req) => {
 });
 ```
 
-有没有什么办法可以为 `req.params` 提供类型支持，让它能够从传入的路由定义中解析出参数？为了方便展示，我们准备了下面的代码：
+有没有什么办法可以为 `req.params` 提供类型支持，让它能够从传入的路由定义中解析出参数呢？为了方便展示，我们准备了下面的代码：
 
 ```typescript
 interface MyRequest<T> {
@@ -35,7 +41,7 @@ get("/users/:userId/books/:bookId", (req) => {
 });
 ```
 
-#### 解决方案
+### 解决方案
 
 可以通过[模板字面量类型](TODO)和[递归](TODO)实现对路由定义的解析，这个过程就像在使用正则表达式匹配字符串。
 
@@ -61,7 +67,7 @@ get("/users/:userId/books/:bookId", (req) => {
 });
 ```
 
-#### 进阶方案
+### 进阶方案
 
 上面的方案得到的 `params` 虽说有了正确的键，但是值的类型还是 `unknown`，使用上有些繁琐。我们可以提供更好的类型功能，让用户可以通过 `@` 指定参数类型，就像下面的例子。注意，当不使用 `@` 指定类型时，参数类型应该被设置为 `unknown`。
 
@@ -125,7 +131,7 @@ get("/users/:userId/:phone@number", (req) => {
 });
 ```
 
-### 类型安全的装饰器 `5.0+`
+## 类型安全的装饰器 `5.0+`
 
 这里讨论的「装饰器」并不是 [TypeScript 5.0 版本实现的新装饰器提案](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html#decorators)，而是旧的 Stage 2 装饰器提案。不过，我们会在本节末尾稍微讨论一下是否可以使用新装饰器提案实现本节的功能。
 
@@ -160,7 +166,7 @@ class MyService {
 - 向装饰器传入的类构造函数的类型
 - 为装饰器装饰的属性提供的类型标注
 
-#### 解决方案
+### 解决方案
 
 TypeScript 要求属性装饰器函数必须满足下面的类型，注意到它的返回值类型必须为 `void` 或 `any`。
 
@@ -242,7 +248,7 @@ class MyService {
 
 尽管 TypeScript 在很久以前就支持了旧的 Stage 2 装饰器提案，但直到 5.0 版本开始 TypeScript 内部引入了某项未知的修改，使得我们能够在 `TypedParameterDecorator` 中得到 `Target` 的具体类型。在 4.9 版本及以前，我们只能获得 `unknown`，无法实现对被装饰的属性进行类型检查。
 
-#### 提供具体的报错信息
+### 提供具体的报错信息
 
 在上面的代码中，当装饰器的类型检查不通过时的报错信息是：
 
@@ -263,7 +269,7 @@ type DoCheck<T, U> = IsEqual<T, U> extends true
 
 > Decorator function return type is 'MyTypeError<"Type of parameter is not equal to type of decorator">' but is expected to be 'void' or 'any'.
 
-#### 关于新装饰器的讨论
+### 关于新装饰器的讨论
 
 对于从 5.0 版本开始支持的新装饰器提案来说，它并不支持装饰声明在构造函数中的类成员变量：
 
@@ -289,7 +295,7 @@ class Main {
 
 > 或许就是因为新装饰器能够获得被装饰的属性的具体类型，从 TypeScript 5.0 开始旧装饰器也跟着具备了上述的访问 `Target` 类型的能力。
 
-### 类型安全的 Event Emitter
+## 类型安全的 Event Emitter
 
 Event Emitter 相信大家用的都很多了，我们接下来用 TypeScript 写一个「类型安全」的 Event Emitter。本节的重心在如何使用 TypeScript 的类型系统，所以不会提供具体的代码实现，也会省略 `off()` 函数。
 
@@ -305,11 +311,11 @@ declare function on(key: string, handler: (...args: unknown[]) => void): void;
 // 省略 off
 ```
 
-#### 简易实现的问题
+### 简易实现的问题
 
 简易实现的这简简单单的几行代码，却存在着比有效行数更多的问题。我们接下来先分析这些问题，然后尝试使用多种方案解决上面的问题。方案的先后顺序不代表绝对的优劣，却或多或少地体现出我个人对它们的偏好（不同的方案总是有着不同的魅力……你应该懂的）。
 
-##### 参数类型匹配
+#### 参数类型匹配
 
 如何确保释放事件的参数类型和监听事件的参数类型相匹配？例如，在下面的代码中：
 
@@ -326,7 +332,7 @@ on("I_AM_HUNGRY", (isReallyHungry) => {
 });
 ```
 
-##### 事件名的正确性 & 冲突问题
+#### 事件名的正确性 & 冲突问题
 
 如何确保监听事件传入的事件名正确？
 
@@ -335,13 +341,13 @@ on("I_AM_HUNGRY", (isReallyHungry) => {
 
 目前的很多实践会通过手动定义并导出一些常量或枚举来让事件名常量化，但取决于具体的实现方式，它可能会带来额外的问题：不存在一种中心化的机制防止事件名冲突。
 
-##### 参数名称标注
+#### 参数名称标注
 
 在上面的例子中，我们发现事件提供的参数的名称是由事件的监听器定义的，这看上去是非常奇怪的。事件的定义，包括参数的名称应由释放事件一方负责，但碍于简易实现的问题没有办法做到这点。
 
 参数名称的标注问题同样是危险的，因为一旦事件释放一方修改了参数的含义，使得它和现有的监听事件方不再一致，那么很可能导致一些出人意料且难以排查的运行时 bug。
 
-#### 解决方案
+### 解决方案
 
 ```typescript
 interface EventDefinitions {
@@ -382,7 +388,7 @@ on("I_AM_HUNGARY", () => {});
 1. 如果要修改已有事件的名字，例如将 `I_AM_HUNGRY` 改为 `WO_E_LE`，TypeScript 不会自动修改使用了这个事件的 `emit` 和 `on` 调用中传入的字符串名称，这意味着你可能需要依赖全局搜索手动修改
 2. 在大型项目中，维护一个中心化的 `interface` 定义可能是困难的，或者说有时会存在一些扩展需求，即在另外的源文件中定义特殊的事件
 
-#### 解决第一个缺点
+### 解决第一个缺点
 
 对于第一个缺点，其实这是使用联合类型作为枚举时的「通病」，要解决这种通病可以尝试直接使用枚举。
 
@@ -398,7 +404,7 @@ interface EventDefinitions {
 on(EventKeys.I_AM_HUNGRY, (isReallyHungry) => {});
 ```
 
-#### 解决第二个缺点
+### 解决第二个缺点
 
 还记得我们在[模块扩充](TODO)中的讨论吗？对于接口 `EventDefinitions`，可以在某个单独的源文件中定义一个空接口，然后在其它源文件中通过模块扩充来扩充它的定义，这样可以实现在不同的源文件中扩充同一个类型定义。
 
@@ -445,7 +451,7 @@ on(EventKeys.I_AM_HUNGRY, (isReallyHungry) => {});
 > [!WARNING]
 > 常值枚举以及关于它的模块扩充是一个极为复杂的功能，对于除了 tsc 以外的 TypeScript 编译器（例如 swc、esbuild、babel 等）来说它们很可能不会提供「正确」的输出，如果你想要在生产环境中接入这里的解决方案，请务必事先确认自己使用的编译工具链是否能输出正确的结果。参见[前文的讨论](TODO)。
 
-### 类型安全的文案注册
+## 类型安全的文案注册
 
 某个 Web App 的文案定义在 `.ts` 文件中，具有下面的形式：
 
@@ -507,7 +513,7 @@ interface I18nError<T extends string> {
 
 本节的完整的代码可以在 [TypeScript Playground](https://www.typescriptlang.org/play?ts=5.2.2&q=483#code/C4TwDgpgBACghgZwVAvFArgOwNaYPYDumA3AFCmiRQCSAjAByapQBKEAxngE4AmAPAmBcAlpgDmAGlYdu-QSPFT5osQD5VZUjw4AbOF2idMgqAFEWLAPIsA+gGUAmgFkAQpYAyALgyZhAR3RoBBAAWwAjPB1NUWAILgAzOHZoOkZTLi5uPgAVKAgAD1jMHmRlcVUoAG9SKCgAbXMrW0dXDwBdb2yyAF9yShSEUwC4HT4AQSkXKVy0CagAMVpmKYWAJmZFirQ6sba8wohi5DqXNpqoAH560-2ikvrd89qr7Keob3nV84-aTX6oADCAAsONh3HBxOg4GIIAgcrdDvdUpgtjRBsNRudsBAQHh4lBshJzgAiQ4AWgAqnZiVAAD5QYkALyBZIBADliUTavAkFyaAxMOlMlw+MTsng8FAQhCQFA9JDodBtPFRMJgMI8MZiao+cihVliU5hEgVHKIWIoTCoMrVerNQhtaQNH1wNAAOIQYBjHQ6bJcCEIPR2zAAaRxcNyBTuyGRqOqtTqIagoig2Nx+OyHVTOLxBMTbR6dTTuczf1dgJB7GwfoDQY1ofDfHOkYOR35jD5YwRbbKYmYHq9PprxjrmrDIAjFQAZFBe3yk2hi-j47V6kmU0uCVBEGihlDRpvsvmpHNMBAAG5xKQh1RZs+XrhkWq9VHUdH7pu1EN8+9X848hBdQFfURQAAyNE1xGzCcoHibgzQVK0AHIABJKiTGde26JDQNUJ0yyoNgEEiS9qEwWIuDASI4GDOFm27e453OIiGNKIRTTQX8uCdZgW2jKBQLQrDKjQ0R4jiKBx26bpRMwcSuGkQRulA84riIkiIDIiiqNHYw+CI4ApBY+lxzw2pvCIgjoGBUEtLiHSaPrCMpHcVjZ3YxQoAANTc3tUU3FdE2TJhD23GN3xGT9VyPEM2jqVyZ0PfM2j5Wp1J0UjyPs6jaL4LydTeLjUsk85b28LieisitQWHQNHM1LyRkCOjaj4xEYwFPkKWYFcE3XEKcwzLNetXOonGC6CS2SizYQ0uzKJypycnzMa2mdVcoG6J9Nr5Hy0BGoKN0GglhreBNxqO9M81irMbKreaHNyikpHGzCPMka64qcNbtufbaX2YN890i84ivOA7+sm-EvNOjbzomzcvOm3cMSiuHvJW77io2sH0dqXG8b1DIslAsjrQgFVfGDKBc1Q9CoDehQxGwqQhFreqmAINUgWgqA6des64awpDrTwWEoHwYBZyBfRoGAEFZzgEJoBibLdOQLn5ageWaJp-E6aR2LVoZwWNuF3DBfW1duiLY7DbaAtzhtxGUvOLBcEITB8JdKgABE8Du7AIzc2NAYizFuUQQDzkD8FENhHICtqIHUbeADisD2rdPHSdipTj90+qqss45xqdGaxOzKgPDnVIeIsHYambTPdT0C4ZI+CMEw2rbWMAApzgMYi2+SbwIYR47MzHqAyQMOAeE1HRZTGierpih3OkxvYtqdhmoH9wPJ1IABKKpB89NumCHvAR4gHpyC7qXhAFZhm4gVv24gPuV1JTBKWpMebxiRgEVAAOh0HgMQohwGQNEDYMI6BgDAE1MSbwxJ3CwMwJyIBICYQwKgZgUBcEuBiDwMAGwICkAEFkKghk8xuCkKlgBahvALjYI2sAsBECCGgPQAgOICAbCL1EBAWhxJKicCwMAboGB+FcGQMIs87CdokmZKyDkgCOG4IgPg6B3C4EIKQSgtBgBvN0AKr6yjaicLwfowhxDGEUKjiwngYjAAb+oABujABj2oAQA9AD4-5Yhk2jdGEL4QIoRmAdAiLERIm+5EZGAFl5QAWPKAA0VQAFOqAH6-ZR3QiTdGPmQIAA) 中看到。
 
-#### 检查对象的键
+### 检查对象的键
 
 检查对象是否仅含 `en-US` 和 `zh-CN` 两个键是平凡的，只需要让它们和 `keyof T` 进行比较即可。不过，由于 `keyof T` 会返回联合类型，为了绕过[分配式联合类型](TODO)特性，我们用方括号将比较双方包围，这样比较的就是元组类型而不是联合类型（`IsEqual` 内部已经做了这件事情）。
 
@@ -521,7 +527,7 @@ type CheckLanguages<T extends I18n> = IsEqual<
 >;
 ```
 
-#### 检查是否具有相同的文案种类
+### 检查是否具有相同的文案种类
 
 这里使用一个简单的实现思路：将各个语言对应的对象的所有键（也就是文案）表示为联合类型，然后将这些联合类型合并在一起得到一个大的联合类型，最后检查每个语言对应的对象的键构成的联合类型是否等于这个联合类型。
 
@@ -553,7 +559,7 @@ type CheckTranslationKeys<
 >;
 ```
 
-#### 检查文案的翻译是否引用相同的插值
+### 检查文案的翻译是否引用相同的插值
 
 给定一个字符串字面量类型，提取出它格式为 `{key}` 的插值并表示为联合类型是简单的。具体的代码如下所示，注意到我们仍然使用了联合类型去充当 Set 的作用，它一方面用来存储找到的插值，另一方面可以自动去重。
 
@@ -639,7 +645,7 @@ type CheckTranslationValues<
 >;
 ```
 
-#### 将三种检查串在一起
+### 将三种检查串在一起
 
 为了防止三种检查相互干扰，我们通过条件类型来先后执行这三种检查。如果前面的检查失败，后面的检查就不会执行。请看下面的代码：
 
@@ -671,19 +677,23 @@ function defineResource<const T extends I18n>(
 }
 ```
 
-#### 效果展示
+### 效果展示
 
 本节的完整的代码可以在 [TypeScript Playground](https://www.typescriptlang.org/play?ts=5.2.2&q=483#code/C4TwDgpgBACghgZwVAvFArgOwNaYPYDumA3AFCmiRQCSAjAByapQBKEAxngE4AmAPAmBcAlpgDmAGlYdu-QSPFT5osQD5VZUjw4AbOF2idMgqAFEWLAPIsA+gGUAmgFkAQpYAyALgyZhAR3RoBBAAWwAjPB1NUWAILgAzOHZoOkZTLi5uPgAVKAgAD1jMHmRlcVUoAG9SKCgAbXMrW0dXDwBdb2yyAF9yShSEUwC4HT4AQSkXKVy0CagAMVpmKYWAJmZFirQ6sba8wohi5DqXNpqoAH560-2ikvrd89qr7Keob3nV84-aTX6oADCAAsONh3HBxOg4GIIAgcrdDvdUpgtjRBsNRudsBAQHh4lBshJzgAiQ4AWgAqnZiVAAD5QYkALyBZIBADliUTavAkFyaAxMOlMlw+MTsng8FAQhCQFA9JDodBtPFRMJgMI8MZiao+cihVliU5hEgVHKIWIoTCoMrVerNQhtaQNH1wNAAOIQYBjHQ6bJcCEIPR2zAAaRxcNyBTuyGRqOqtTqIagoig2Nx+OyHVTOLxBMTbR6dTTuczf1dgJB7GwfoDQY1ofDfHOkYOR35jD5YwRbbKYmYHq9PprxjrmrDIAjFQAZFBe3yk2hi-j47V6kmU0uCVBEGihlDRpvsvmpHNMBAAG5xKQh1RZs+XrhkWq9VHUdH7pu1EN8+9X848hBdQFfURQAAyNE1xGzCcoHibgzQVK0AHIABJKiTGde26JDQNUJ0yyoNgEEiS9qEwWIuDASI4GDOFm27e453OIiGNKIRTTQX8uCdZgW2jKBQLQrDKjQ0R4jiKBx26bpRMwcSuGkQRulA84riIkiIDIiiqNHYw+CI4ApBY+lxzw2pvCIgjoGBUEtLiHSaPrCMpHcVjZ3YxQoAANTc3tUU3FdE2TJhD23GN3xGT9VyPEM2jqVyZ0PfM2j5Wp1J0UjyPs6jaL4LydTeLjUsk85b28LieisitQWHQNHM1LyRkCOjaj4xEYwFPkKWYFcE3XEKcwzLNetXOonGC6CS2SizYQ0uzKJypycnzMa2mdVcoG6J9Nr5Hy0BGoKN0GglhreBNxqO9M81irMbKreaHNyikpHGzCPMka64qcNbtufbaX2YN890i84ivOA7+sm-EvNOjbzomzcvOm3cMSiuHvJW77io2sH0dqXG8b1DIslAsjrQgFVfGDKBc1Q9CoDehQxGwqQhFreqmAINUgWgqA6des64awpDrTwWEoHwYBZyBfRoGAEFZzgEJoBibLdOQLn5ageWaJp-E6aR2LVoZwWNuF3DBfW1duiLY7DbaAtzhtxGUvOLBcEITB8JdKgABE8Du7AIzc2NAYizFuUQQDzkD8FENhHICtqIHUbeADisD2rdPHSdipTj90+qqss45xqdGaxOzKgPDnVIeIsHYambTPdT0C4ZI+CMEw2rbWMAApzgMYi2+SbwIYR47MzHqAyQMOAeE1HRZTGierpih3OkxvYtqdhmoH9wPJ1IABKKpB89NumCHvAR4gHpyC7qXhAFZhm4gVv24gPuV1JTBKWpMebxiRgEVAAOh0HgMQohwGQNEDYMI6BgDAE1MSbwxJ3CwMwJyIBICYQwKgZgUBcEuBiDwMAGwICkAEFkKghk8xuCkKlgBahvALjYI2sAsBECCGgPQAgOICAbCL1EBAWhxJKicCwMAboGB+FcGQMIs87CdokmZKyDkgCOG4IgPg6B3C4EIKQSgtBgBvN0AKr6yjaicLwfowhxDGEUKjiwngYjAAb+oABujABj2oAQA9AD4-5Yhk2jdGEL4QIoRmAdAiLERIm+5EZGAFl5QAWPKAA0VQAFOqAH6-ZR3QiTdGPmQIAA) 中找到。下面的视频展示了最终的效果。
 
-![](./assets/chapter4/demo.mp4)
+<p align="center">
+  <img src="./assets/chapter4/demo.gif" width="800" />
+</p>
 
 > 我们其实可以做得更好，可以考虑改进报错的粒度以及报错信息里的提示。
 
-### 端到端类型安全（End-to-End Type-Safety）
+## 端到端类型安全（End-to-End Type-Safety）
 
 Web 前端界每隔一段时间就会出现一些爆款，感觉很多都有不少的水分，不过其中的 [tRPC](https://trpc.io/) 库却让人眼前一亮。这个库宣称自己为 API 调用提供了「端到端」的类型安全支持。可能就是这个库提出或者发扬了「端到端的类型安全」这个概念，以至于后续出现的很多新的服务端框架都提供了这种功能。
 
-![](./assets/chapter4/trpc.mp4)
+<p align="center">
+  <img src="./assets/chapter4/trpc.gif" width="800" />
+</p>
 
 虽然文档中似乎没有解释这个概念具体是什么意思，不过我暂且假定它指的是这种能力：服务端源文件的路由的类型定义（包括具体的请求体类型和响应体类型）可以直接传播到客户端的源文件中。
 
@@ -856,3 +866,9 @@ export type Context<
 ```
 
 至于 `Handler` 返回的函数类型的返回值，它定义中的返回值类型是用来做类型检查的，如果我们使用了其它 Elysia 的 API，那么这些 API 可能会限制处理函数能够返回的值的类型。
+
+---
+
+| **上一章** | **目录** | **下一章** |
+| :------------- | :----------: | :------: |
+| [第三章：类型编程](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md) | [你可能不知道的 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84-typescript) | [第五章：探索之路](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter5.md) |
