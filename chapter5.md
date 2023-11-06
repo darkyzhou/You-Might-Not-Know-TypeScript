@@ -119,7 +119,9 @@ const html = match(result)
 
 针对字符串字面量类型的工具类型库，下面的图片来自它的 README。
 
-<img src="./assets/chapter5/string_ts.gif" style="zoom:33%;" />
+<p align="center">
+  <img src="./assets/chapter5/string_ts.gif" width="700" />
+</p>
 
 ### [type-fest](https://github.com/sindresorhus/type-fest)
 
