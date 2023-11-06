@@ -53,9 +53,8 @@ TypeScript 的纪录片，比较有看点的地方：
 关于 TypeScript 的书籍，我能找到的似乎都是一些内容偏向基础的书籍。它们讨论的内容并不会像本文那样深入（或者说硬核），也许是因为这些知识不太成体系，并且大多属于经验之谈（尽管有一定的源码和文档支撑）。
 
 | **Effective TypeScript** | **Learning TypeScript** |
-| :------------- | :----------: |
-| <img src="./assets/chapter5/effective_typescript.png" width="200" /><br />提供了 62 种改善 TypeScript 使用技巧的方式，让你摆脱一些关于 TypeScript 的常见误用。书中还讨论了 TypeScript 的许多并没有在文档中介绍得清楚的机制，例如 Type Narrowing 和 Type Widening，帮助你理清 TypeScript 的一些设计原则和机制细节。<br />总的来说，这是一本在闲暇之余可以读读看的好书。<br />注意：此书第一版发布于 2019 年底，至今已经接近 4 年，在这个过程中 TypeScript 已经发生了很多新的改变。书中讨论的一些问题已经有了更好、更现代的解法，可以参考本文章来形成互补。 | <img src="./assets/chapter5/learning_typescript.png" width="200" /><br />补充 TypeScript 基础知识的好书，涵盖了很多 TypeScript 官方文档没有涉及或讲得不多的内容，尤其是其中的：<br />- 关于泛型的各种机制的介绍<br />- 对 declaration files（声明文件，即 d.ts 文件）的介绍<br />- 对 TypeScript 的配置项（特别是 tsconfig）的介绍<br />本书的发布日期非常新，于 2022 年 7 月发行第二版，可以说是目前入门 TypeScript 的首选好书。 |
----
+| :------------- | :---------- |
+| <img src="./assets/chapter5/effective_typescript.png" width="200" /><br />提供了 62 种改善 TypeScript 使用技巧的方式，让你摆脱一些关于 TypeScript 的常见误用。书中还讨论了 TypeScript 的许多并没有在文档中介绍得清楚的机制，例如 Type Narrowing 和 Type Widening，帮助你理清 TypeScript 的一些设计原则和机制细节。<br />总的来说，这是一本在闲暇之余可以读读看的好书。<br />注意：此书第一版发布于 2019 年底，至今已经接近 4 年，在这个过程中 TypeScript 已经发生了很多新的改变。书中讨论的一些问题已经有了更好、更现代的解法，可以参考本文章来形成互补。 | <img src="./assets/chapter5/learning_typescript.png" width="200" /><br />补充 TypeScript 基础知识的好书，涵盖了很多 TypeScript 官方文档没有涉及或讲得不多的内容，尤其是其中的：<ul><li>关于泛型的各种机制的介绍</li><li>对 declaration files（声明文件，即 d.ts 文件）的介绍</li><li>对 TypeScript 的配置项（特别是 tsconfig）的介绍</li></ul>本书的发布日期非常新，于 2022 年 7 月发行第二版，可以说是目前入门 TypeScript 的首选好书。 |
 
 ## 类型库
 
