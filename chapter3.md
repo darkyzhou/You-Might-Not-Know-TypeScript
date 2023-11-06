@@ -6,7 +6,7 @@
 
 # 类型编程
 
-进阶话题中的内容远远不是 TypeScript 强大的类型系统的全部。还记得[类型系统的目的](TODO)说过的，TypeScript 的设计目标之一是为「结构」提供检查手段吗？我们已经在进阶话题中讨论了很多检查手段，不过它们大多都只是直接基于类型系统提供的原语实现的。事实上，这套类型系统还能构造出更加复杂的检查手段，而它们才真正代表了 TypeScript 的上限。
+进阶话题中的内容远远不是 TypeScript 强大的类型系统的全部。还记得[类型系统的目的](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E7%9A%84)说过的，TypeScript 的设计目标之一是为「结构」提供检查手段吗？我们已经在进阶话题中讨论了很多检查手段，不过它们大多都只是直接基于类型系统提供的原语实现的。事实上，这套类型系统还能构造出更加复杂的检查手段，而它们才真正代表了 TypeScript 的上限。
 
 有关 TypeScript 的类型系统，你可能听说过一个极其经典的说法，即[它的类型系统是图灵完备（turing complete）的](https://github.com/microsoft/TypeScript/issues/14833)。我不是 PL 的研究者，所以不会在这里做复杂的讨论，我们只需要知道 TypeScript 的类型系统具有极为强大的计算能力，这种能力至少在图灵完备的视角上和 Java、C++、JavaScript 等现代编程语言相当。基于这种计算能力，理论上我们能够使用 TypeScript 表达很多复杂的类型限制（尽管难度可能不低）。
 
@@ -50,15 +50,15 @@ function nullable(someType) {
 }
 ```
 
-这种基于给定类型构造其它类型的过程是类型编程的基础之一，我们会在[后文](TODO)继续讨论这一点。
+这种基于给定类型构造其它类型的过程是类型编程的基础之一，我们会在[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%87%BD%E6%95%B0%E6%B3%9B%E5%9E%8B)继续讨论这一点。
 
 ### 函数中的泛型
 
-在声明函数时，我们也可以为函数引入泛型。不过，和类型中的泛型不同，函数中的泛型既可以手动指定也可以由 TypeScript 自动推导。而后者是利用 TypeScript 对值进行特殊的类型检查所依赖的底层能力。我们将马上在[后文](TODO)继续讨论这一话题。
+在声明函数时，我们也可以为函数引入泛型。不过，和类型中的泛型不同，函数中的泛型既可以手动指定也可以由 TypeScript 自动推导。而后者是利用 TypeScript 对值进行特殊的类型检查所依赖的底层能力。我们将马上在[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%87%BD%E6%95%B0%E6%B3%9B%E5%9E%8B)继续讨论这一话题。
 
 ### 泛型约束（Generic Constraints）
 
-通过对泛型参数使用 `extends` 关键字，可以限定这个泛型的类型范围，参见[类型是值的集合](TODO)。
+通过对泛型参数使用 `extends` 关键字，可以限定这个泛型的类型范围，参见[类型是值的集合](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%80%BC%E7%9A%84%E9%9B%86%E5%90%88)。
 
 在下面的例子中，我们定义了一个带泛型的类型，它接受一个字符串类型的泛型参数，输出一个函数类型。要使用这个类型，需要为泛型指定一个具体的类型，比如 `'seele'`。
 
@@ -252,7 +252,7 @@ type LoopImpl<
 > = Acc["length"] extends N ? "END" : LoopImpl<N, [never, ...Acc]>;
 ```
 
-随着[模板字面量类型（template literal types）](TODO)的引入，你可能会觉得字符串字面量类型也能够实现类似的功能。不过很可惜，TypeScript 目前并不会像对待元组那样给它的 `length` 属性返回具体的长度类型，而是返回 `number`。不过，你可以通过下面的方式计算一个字符串字面量类型的长度：
+随着[模板字面量类型（template literal types）](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%A8%A1%E6%9D%BF%E5%AD%97%E9%9D%A2%E9%87%8F%E7%B1%BB%E5%9E%8Btemplate-literal-types-41)的引入，你可能会觉得字符串字面量类型也能够实现类似的功能。不过很可惜，TypeScript 目前并不会像对待元组那样给它的 `length` 属性返回具体的长度类型，而是返回 `number`。不过，你可以通过下面的方式计算一个字符串字面量类型的长度：
 
 ```typescript
 type LengthOfString<S extends string, T extends never[] = []> =
@@ -437,7 +437,7 @@ const _1 = setup({ initial() { return "seele"; } });
 
 2. **解析方法签名中对应参数的类型，设为目标类型（target type）**
 
-   这里目标类型会被直接解析为 `{ initial(): T }`。对于一些复杂的类型，TypeScript 会做额外的处理，例如对于[条件类型](TODO)，TypeScript 会尝试同时取它的真分支和假分支对应的类型。
+   这里目标类型会被直接解析为 `{ initial(): T }`。对于一些复杂的类型，TypeScript 会做额外的处理，例如对于[条件类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%9E%8Bconditional-types)，TypeScript 会尝试同时取它的真分支和假分支对应的类型。
 
 3. **将源类型和目标类型进行对比，匹配属性得到 `T` 的推导类型**
 
@@ -537,7 +537,7 @@ declare function check<T extends string[]>(
 
 #### 定制报错信息
 
-当需要进行约束检查的 `T` 是对象和元组类型时，可以通过[名义类型](TODO)提供「约束检查报错信息」。上面的例子可以改成下面这样，注意报错信息的末尾是如何展现我们提供的报错信息的。
+当需要进行约束检查的 `T` 是对象和元组类型时，可以通过[名义类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%90%8D%E4%B9%89%E7%B1%BB%E5%9E%8Bnominal-typing)提供「约束检查报错信息」。上面的例子可以改成下面这样，注意报错信息的末尾是如何展现我们提供的报错信息的。
 
 ```typescript
 declare const ERROR_SYMBOL: unique symbol;
@@ -583,7 +583,7 @@ check({}) satisfies never;
 
 #### 匹配元组类型 `4.0+`
 
-我们已经在介绍[可变元组类型](TODO)时讨论过，可以使用 JavaScript 中的数组相关语法来匹配元组。下面是一些例子：
+我们已经在介绍[可变元组类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%8F%AF%E5%8F%98%E5%85%83%E7%BB%84%E7%B1%BB%E5%9E%8Bvariadic-tuple-types-40)时讨论过，可以使用 JavaScript 中的数组相关语法来匹配元组。下面是一些例子：
 
 ```typescript
 // 获得除了第一个元素之外的剩余元素

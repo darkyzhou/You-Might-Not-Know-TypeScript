@@ -12,6 +12,9 @@
 
 ## 目录
 
+> [!NOTE]
+> 推荐在阅读时点击文件右上角的大纲按钮（编辑按钮右边那个）来展示章节的大纲，这样有助于理解章节内容
+
 - [第一章：基础知识](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md)
 - [第二章：进阶话题](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md)
 - [第三章：类型编程](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md)
@@ -36,4 +39,3 @@
 - Optional Variance Annotations 以及函数参数的双向协变
 - 聊聊对象类型
   - `type` 和 `interface` 关键字的区别，包括隐式的 [index] 声明（忘记这个叫啥了）
-  - `const` 声明的对象字面量不允许 upcast

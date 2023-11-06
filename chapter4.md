@@ -43,7 +43,7 @@ get("/users/:userId/books/:bookId", (req) => {
 
 ### 解决方案
 
-可以通过[模板字面量类型](TODO)和[递归](TODO)实现对路由定义的解析，这个过程就像在使用正则表达式匹配字符串。
+可以通过[模板字面量类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%A8%A1%E6%9D%BF%E5%AD%97%E9%9D%A2%E9%87%8F%E7%B1%BB%E5%9E%8Btemplate-literal-types-41)和[递归](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E9%80%92%E5%BD%92%E4%B8%8E%E5%BE%AA%E7%8E%AF)实现对路由定义的解析，这个过程就像在使用正则表达式匹配字符串。
 
 `Res` 的联合类型充当了 Set 的作用，即可自动去重的元组类型。特别地，`never` 表示「空状态」。
 
@@ -381,7 +381,7 @@ on("I_AM_HUNGARY", () => {});
 上述方案的要点如下：
 
 - 使用 `interface` 的属性名作为事件名，我们可以通过 `keyof` 取出它的属性名
-- 使用[具名元组](TODO)定义参数列表。当在函数参数中使用具名元组作为 [Rest Parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 的类型时，TypeScript 会自动使用元素的名称作为对应参数的名称
+- 使用[具名元组](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%85%B7%E5%90%8D%E5%85%83%E7%BB%84%E5%85%83%E7%B4%A0labeled-tuple-elements40)定义参数列表。当在函数参数中使用具名元组作为 [Rest Parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 的类型时，TypeScript 会自动使用元素的名称作为对应参数的名称
 
 我们目前做到的功能已经和拥有着 9.6k 个 star 的 Event Emitter 库 [mitt](https://github.com/developit/mitt) 基本一样了，但是它还是存在下列缺点：
 
@@ -406,9 +406,9 @@ on(EventKeys.I_AM_HUNGRY, (isReallyHungry) => {});
 
 ### 解决第二个缺点
 
-还记得我们在[模块扩充](TODO)中的讨论吗？对于接口 `EventDefinitions`，可以在某个单独的源文件中定义一个空接口，然后在其它源文件中通过模块扩充来扩充它的定义，这样可以实现在不同的源文件中扩充同一个类型定义。
+还记得我们在[模块扩充](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%A8%A1%E5%9D%97%E6%89%A9%E5%85%85module-augmentation)中的讨论吗？对于接口 `EventDefinitions`，可以在某个单独的源文件中定义一个空接口，然后在其它源文件中通过模块扩充来扩充它的定义，这样可以实现在不同的源文件中扩充同一个类型定义。
 
-对于 `EventKeys` 来说，因为枚举定义涉及到值的定义，而模块扩充只能扩充类型定义，所以不能直接如法炮制。不过，你也许记得[常值枚举和模块扩充之间奇妙的化学反应](TODO)。我们可以将 `EventKeys` 声明为常值枚举来让它能够在模块扩充中使用，绕开了值定义的问题。
+对于 `EventKeys` 来说，因为枚举定义涉及到值的定义，而模块扩充只能扩充类型定义，所以不能直接如法炮制。不过，你也许记得[常值枚举和模块扩充之间奇妙的化学反应](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%9C%A8%E6%A8%A1%E5%9D%97%E6%89%A9%E5%85%85%E4%B8%AD%E4%BD%BF%E7%94%A8)。我们可以将 `EventKeys` 声明为常值枚举来让它能够在模块扩充中使用，绕开了值定义的问题。
 
 ```typescript
 // registry.ts
@@ -446,10 +446,10 @@ on(EventKeys.I_AM_HUNGRY, (isReallyHungry) => {});
 - 还可以将上面的 `registry.ts` 通过 tsconfig.json 中的配置赋予一些特殊的路径名，例如 `@registry`，这样可以让各个源文件都能通过方便的方式引用到这个文件
 
 > [!WARNING]
-> 不建议将 `registry.ts` 或者任何常值枚举通过共享库的方式发布，换句话说上述技巧只推荐在一些终端应用（不会被其它包依赖）中使用。参见[前文的讨论](TODO)。
+> 不建议将 `registry.ts` 或者任何常值枚举通过共享库的方式发布，换句话说上述技巧只推荐在一些终端应用（不会被其它包依赖）中使用。参见[前文的讨论](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E4%B8%8D%E6%8E%A8%E8%8D%90%E5%9C%A8%E5%85%B1%E4%BA%AB%E5%BA%93%E4%B8%AD%E4%BD%BF%E7%94%A8)。
 
 > [!WARNING]
-> 常值枚举以及关于它的模块扩充是一个极为复杂的功能，对于除了 tsc 以外的 TypeScript 编译器（例如 swc、esbuild、babel 等）来说它们很可能不会提供「正确」的输出，如果你想要在生产环境中接入这里的解决方案，请务必事先确认自己使用的编译工具链是否能输出正确的结果。参见[前文的讨论](TODO)。
+> 常值枚举以及关于它的模块扩充是一个极为复杂的功能，对于除了 tsc 以外的 TypeScript 编译器（例如 swc、esbuild、babel 等）来说它们很可能不会提供「正确」的输出，如果你想要在生产环境中接入这里的解决方案，请务必事先确认自己使用的编译工具链是否能输出正确的结果。参见[前文的讨论](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%9C%A8%E6%A8%A1%E5%9D%97%E6%89%A9%E5%85%85%E4%B8%AD%E4%BD%BF%E7%94%A8)。
 
 ## 类型安全的文案注册
 
@@ -515,7 +515,7 @@ interface I18nError<T extends string> {
 
 ### 检查对象的键
 
-检查对象是否仅含 `en-US` 和 `zh-CN` 两个键是平凡的，只需要让它们和 `keyof T` 进行比较即可。不过，由于 `keyof T` 会返回联合类型，为了绕过[分配式联合类型](TODO)特性，我们用方括号将比较双方包围，这样比较的就是元组类型而不是联合类型（`IsEqual` 内部已经做了这件事情）。
+检查对象是否仅含 `en-US` 和 `zh-CN` 两个键是平凡的，只需要让它们和 `keyof T` 进行比较即可。不过，由于 `keyof T` 会返回联合类型，为了绕过[分配式联合类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%88%86%E9%85%8D%E5%BC%8F%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%9E%8Bdistributive-conditional-types)特性，我们用方括号将比较双方包围，这样比较的就是元组类型而不是联合类型（`IsEqual` 内部已经做了这件事情）。
 
 ```typescript
 type CheckLanguages<T extends I18n> = IsEqual<
@@ -611,7 +611,7 @@ type CheckInterpolations<T, L extends string, V extends string> = keyof {
 
 - `U` 作为「局部变量」存储了从 `ResolveInterpolations` 得到的信息：各个语言的各个文案使用了哪些插值，用联合类型表示
 - `V` 作为另一个「局部变量」存储了从 `CheckInterpolations` 得到的信息：各个语言的各个文案，使用了和哪些语言的对应文案不同的插值，为 `never` 时表示「没有，都一样！」
-- 从第十三行开始，我们检查 `V` 的各个值是否为 `never`，也即「是否存在有问题的文案值」。注意我们这里是如何利用对应的泛型参数构造信息量充足的报错信息的。这里还使用了两层嵌套的 [IIMT](TODO)，用来将可能存在的 `I18nError` 提取出来作为联合类型。
+- 从第十三行开始，我们检查 `V` 的各个值是否为 `never`，也即「是否存在有问题的文案值」。注意我们这里是如何利用对应的泛型参数构造信息量充足的报错信息的。这里还使用了两层嵌套的 [IIMT](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#immediately-indexed-mapped-typeiimt)，用来将可能存在的 `I18nError` 提取出来作为联合类型。
   - 当然，如果整个文案对象都没有错误，它会返回 `never`，通过 `IsEqual` 的判断最终返回 `unknown`。
 
 ```typescript
@@ -664,7 +664,7 @@ type DoChecks<T extends I18n> = IsEqual<
 函数 `defineResource` 的代码如下所示，注意：
 
 - 使用 `const T` 是为了让 TypeScript 推导输入对象的类型时，将内含的字符串类型推导为字面量类型
-- 使用第 3 行的映射类型，而不是 `Record<string, Record<string, string>>` 是为了[提供更强的 contextual types](TODO)，让 TypeScript 顺利推导出文案对象这种复杂对象结构的字面量类型。这里的做法是通过经验试出来的。
+- 使用第 3 行的映射类型，而不是 `Record<string, Record<string, string>>` 是为了[提供更强的 contextual types](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#type-parameter-inference)，让 TypeScript 顺利推导出文案对象这种复杂对象结构的字面量类型。这里的做法是通过经验试出来的。
 - `-readonly` 是为了去掉 `const T` 为属性附加的 `readonly` 修饰符。
 
 ```typescript
@@ -780,7 +780,7 @@ api.json.post({
 
 解决了这些问题之后再阅读其它函数的实现不是一件困难的事情（我相信能坚持读到这里的你一定有足够的能力……），而且对于端到端类型安全的原理分析，如果要「认真地」写，恐怕又会需要写出一篇万字长文。
 
-在开始研究源码之前，我们先说结论：它的原理是对函数泛型的巧妙利用，尤其是前文讨论的[各种匹配方法](TODO)和[函数类型闭包](TODO)。简化后的 `get` 函数源码如下所示（只需要关心高亮的代码）。
+在开始研究源码之前，我们先说结论：它的原理是对函数泛型的巧妙利用，尤其是前文讨论的[各种匹配方法](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8C%B9%E9%85%8D%E6%96%B9%E6%B3%95)和[函数类型闭包](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E9%97%AD%E5%8C%85)。简化后的 `get` 函数源码如下所示（只需要关心高亮的代码）。
 
 - `Elysia` 本身就是一个带有泛型参数的类，它携带了包括路由信息 `Routes` 在内的类型闭包
 - 每次调用 `get` 函数之后得到的返回值是一个被扩充了类型信息之后的 `Elysia` 类型，具体被扩充了什么类型信息可以看下面的代码，对于 `get` 函数来说只需要扩充 `Routes` 的定义

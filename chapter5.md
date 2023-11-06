@@ -85,7 +85,7 @@ TypeScript 的纪录片，比较有看点的地方：
 
 ### [ts-typesafe-decorators](https://github.com/sorgloomer/ts-typesafe-decorators)
 
-为旧的 Stage 2 装饰器提供类型检查的工具类型库，本文在生产实践中[类型安全的装饰器](TODO)一节就是受到了这个库的启发。它同样依赖于 TypeScript 5.0 或以上版本，所以又多了一个理由升级 TypeScript。
+为旧的 Stage 2 装饰器提供类型检查的工具类型库，本文在生产实践中[类型安全的装饰器](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter4.md#%E7%B1%BB%E5%9E%8B%E5%AE%89%E5%85%A8%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8-50)一节就是受到了这个库的启发。它同样依赖于 TypeScript 5.0 或以上版本，所以又多了一个理由升级 TypeScript。
 
 ### [ts-essentials](https://github.com/ts-essentials/ts-essentials)
 
@@ -100,8 +100,8 @@ TypeScript 的纪录片，比较有看点的地方：
 
 用于对复杂联合类型进行匹配的类型库，下面的例子来自它的 README。
 
-- 注意它是如何利用[函数类型闭包](TODO)提供丰富的类型功能的
-- 它的 `exhaustive()` 提供了和本文的 [Exhaustive Guard](TODO) 类似的功能
+- 注意它是如何利用[函数类型闭包](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E9%97%AD%E5%8C%85)提供丰富的类型功能的
+- 它的 `exhaustive()` 提供了和本文的 [Exhaustive Guard](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#exhaustive-guardexhaustive-check) 类似的功能
 
 ```typescript
 import { match, P } from 'ts-pattern';

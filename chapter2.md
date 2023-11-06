@@ -326,7 +326,7 @@ const _4 = concat([1] as const, ["foo"] as const);
 
 ### 工具函数 `asTuple` `5.0+`
 
-我们还能够扩展上述的 `concat` 函数，注意其中的变量 `_1`、`_2` 和 `_4`，为什么非得使用 `as const` 才能让 TypeScript 推导出字面量类型呢？实际上，我们可以通过 [`const` 类型参数（`const` type parameters）](TODO) `5.0+` 来改进这一点，让用户无需使用 `as const` 就能让 TypeScript 推导出元组字面量类型：
+我们还能够扩展上述的 `concat` 函数，注意其中的变量 `_1`、`_2` 和 `_4`，为什么非得使用 `as const` 才能让 TypeScript 推导出字面量类型呢？实际上，我们可以通过 [`const` 类型参数（`const` type parameters）](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#const-%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0const-type-parameters-50) `5.0+` 来改进这一点，让用户无需使用 `as const` 就能让 TypeScript 推导出元组字面量类型：
 
 ```typescript
 declare function concat<
@@ -420,7 +420,7 @@ type _2 = "Test (foo) bar" extends `${string}(${infer T})${string}` ? T : never;
 //   ^? type _2 = "foo"
 ```
 
-我们会在[后文](TODO)对条件类型进行详细的讨论。
+我们会在[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%9E%8Bconditional-types)对条件类型进行详细的讨论。
 
 ### 映射类型中键的重映射（Key Remapping in Mapped Types）
 
@@ -517,7 +517,7 @@ console.log(2 /* MyEnum.Baz */);
 
 #### 在模块扩充中使用
 
-还记得我们在[模块扩充](TODO)讨论过的，模块扩充一般用来为现有的类型扩充类型定义，但是不能为它扩充值吗？实际上由于常值枚举的内联特性，我们可以使用对常值枚举使用模块扩充，此时能够实现「扩充值定义」的效果。
+还记得我们在[模块扩充](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%A8%A1%E5%9D%97%E6%89%A9%E5%85%85module-augmentation)讨论过的，模块扩充一般用来为现有的类型扩充类型定义，但是不能为它扩充值吗？实际上由于常值枚举的内联特性，我们可以使用对常值枚举使用模块扩充，此时能够实现「扩充值定义」的效果。
 
 请看下面的例子，我们直接引用 `a.ts` 的 `Registry`，却可以访问到 `b.ts` 中扩充的枚举成员。而且，和对一般的枚举进行的模块扩充不同，我们不需要实际地给扩充类型定义的声明扩充对应的值，却可以在运行时顺利执行，不会遇到报错。这是因为常值枚举具有内联的特性，在 `c.ts` 的编译产物中只会得到 `console.log("foo")`。
 
@@ -600,7 +600,7 @@ const _2: MyEnum = "xxx"; // ERROR!
 
 ## 名义类型（Nominal Typing）
 
-还记得文章开头有关[结构化类型和名义类型之间区别](TODO)的讨论吗？在名义类型中，如果函数的入参是某种特定类型，那么我们就必须通过一定的手段构造出这个类型的值才能输入给函数。在实践中，名义类型的这种对 API 用户侧提供约束的功能有着它独特的用武之地。包括约束功能在内，名义类型有着多种特殊用法。
+还记得文章开头有关[结构化类型和名义类型之间区别](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%BB%93%E6%9E%84%E5%8C%96%E7%B1%BB%E5%9E%8Bstructural-typing)的讨论吗？在名义类型中，如果函数的入参是某种特定类型，那么我们就必须通过一定的手段构造出这个类型的值才能输入给函数。在实践中，名义类型的这种对 API 用户侧提供约束的功能有着它独特的用武之地。包括约束功能在内，名义类型有着多种特殊用法。
 
 ### 在现有类型上施加约束
 
@@ -633,12 +633,12 @@ doSomething(asPositiveValue(123)); // 不报错
 > [!WARNING]
 > **错误处理实在是一个复杂的话题！**
 >
-> 关于一个函数在接受非法输入时是否应该抛错还是返回一种合法结果，需要考虑非常多复杂的状况（尽管大多数时候，人们根本不考虑这些）。名义类型为我们提供了另一种思路：用调用前检查取代调用后抛错，直接阻止用户传入非法输入。我们将在关于[非空数组的讨论](TODO)中继续这个话题。
+> 关于一个函数在接受非法输入时是否应该抛错还是返回一种合法结果，需要考虑非常多复杂的状况（尽管大多数时候，人们根本不考虑这些）。名义类型为我们提供了另一种思路：用调用前检查取代调用后抛错，直接阻止用户传入非法输入。我们将在关于[非空数组的讨论](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E9%9D%9E%E7%A9%BA%E6%95%B0%E7%BB%84non-empty-array)中继续这个话题。
 
 > [!WARNING]
 > **对数组和对象类型使用本节介绍的方法是危险的！**
 >
-> 在 JavaScript 中数组和对象的引用是可以被随意共享的，并没有好的办法保证某个数组或者对象在某个时刻只存在一个引用。这就导致了如果你使用其中一个引用通过了类似 `asPositiveValue` 的名义类型转换，其它代码却可能通过它持有的那份引用修改了对象内部的属性，破坏了名义类型本身的约束。我们将在关于[非空数组的讨论](TODO)中继续这个话题。
+> 在 JavaScript 中数组和对象的引用是可以被随意共享的，并没有好的办法保证某个数组或者对象在某个时刻只存在一个引用。这就导致了如果你使用其中一个引用通过了类似 `asPositiveValue` 的名义类型转换，其它代码却可能通过它持有的那份引用修改了对象内部的属性，破坏了名义类型本身的约束。我们将在关于[非空数组的讨论](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E9%9D%9E%E7%A9%BA%E6%95%B0%E7%BB%84non-empty-array)中继续这个话题。
 
 ### 附加元信息
 
@@ -698,7 +698,7 @@ declare function foo(input: "a" | "b" | (string & {})): void;
 
 ## 控制流中的类型具化
 
-TypeScript 在对源码的控制流分析中可能会施加[类型具化](TODO)，运用好这个特性能够帮助简化代码，以及提供类型检查。
+TypeScript 在对源码的控制流分析中可能会施加[类型具化](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E5%85%B7%E5%8C%96type-narrowing)，运用好这个特性能够帮助简化代码，以及提供类型检查。
 
 ### Discriminated Union Types
 
@@ -725,7 +725,7 @@ function myFunction(value: Apple | Banana | Watermelon) {
 
 在上面的例子中，如果三个 `interface` 都含有不同的属性，那么我们通过 `in` 关键字就能够让 TypeScript 利用类型具化的机制进行区分。但是，实际情况中我们更多地会遇到一些部分含有相同属性的类型。
 
-除了为每个类型编写对应的 [type predicates](TODO) 这种费时费力且[不可扩展](TODO)的办法，我们还可以使用一种被称为 Discriminated Union Types 的技巧。在这种技巧中，需要为每个类型引入一个字符串字面量类型，作为这种类型的标签，它们的属性名必须相同，就像下面的代码那样。
+除了为每个类型编写对应的 [type predicates](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) 这种费时费力且[不可扩展](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E7%9A%84)的办法，我们还可以使用一种被称为 Discriminated Union Types 的技巧。在这种技巧中，需要为每个类型引入一个字符串字面量类型，作为这种类型的标签，它们的属性名必须相同，就像下面的代码那样。
 
 这种技巧的原理是：TypeScript 在计算 `Apple | Banana | Watermelon` 这个联合类型时，会将它们的公共属性（即 `type`）提取出来作为联合类型整体的属性，此时 `type` 会指向 `'apple' | 'banana' | 'watermelon'`。通过使用控制流区分这个联合类型，TypeScript 会自动地具化它所属的 `value` 的类型。
 
@@ -791,9 +791,9 @@ function exhaustiveGuard(value: never): never {
 
 在 `default` 分支中插入 `exhaustiveGuard(someValue)` 就可以检查当前分支下的值是不是 `never`——换句话说，通过这种方式我们可以在编译期就检查条件语句是否考虑了值的类型的所有情况，避免需要检查的值因为被引入了新的枚举值（或者联合类型）导致对应的情况进入了 `default` 分支造成各种问题。
 
-理论上来说，`exhaustiveGuard()` 里的抛错语句不是必要的——因为在编译时就可以抛错了，对吧？不过，保险起见还是要在运行时做好兜底，因为[我们常常会通过滥用 as 等方式欺骗 TypeScript](TODO)，让这套仅存在于编译期的机制误以为我们已经处理了所有情况。
+理论上来说，`exhaustiveGuard()` 里的抛错语句不是必要的——因为在编译时就可以抛错了，对吧？不过，保险起见还是要在运行时做好兜底，因为[我们常常会通过滥用 as 等方式欺骗 TypeScript](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%BB%A5%E7%94%A8%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80type-assertion)，让这套仅存在于编译期的机制误以为我们已经处理了所有情况。
 
-如果你不在乎运行时的兜底，可以使用 `satisfies 4.9+` 来做到相同的事情。我们会在[后文](TODO)介绍这个关键字。
+如果你不在乎运行时的兜底，可以使用 `satisfies 4.9+` 来做到相同的事情。我们会在[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%BB%A5%E7%94%A8%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80type-assertion)介绍这个关键字。
 
 ```typescript
 switch (someValue) {
@@ -839,7 +839,7 @@ function myFunction(value: any) {
 
 **「不关心类型为何」** 不能被等同于 **「可以忽略它的类型」**，而应被视为 **「它存在一个未知的类型」** 。许多人采用了前一种思考方式，让 `any` 类型禁用了相关的类型检查，导致代码出现了具有传播性的漏洞，这种漏洞会导致类型错误逃逸到运行时中，削弱了 TypeScript 本身的作用。试想，我们需要调用一个仅接受字符串的 API，而实际传入的是一个 `any` 类型的值，我们又做了什么事情确保它的类型是正确的呢？
 
-同样是上面的例子，当使用 `unknown` 取代 `any` 之后，TypeScript 正确地提供了类型错误，让我们在使用 `value` 之前先确定好它的具体类型。从这个角度来说，`unknown` 远比 `any` 更加切合需求。事实上，除了「[都是 top types](TODO)」这一点外，`unknown` 和 `any` 几乎没有任何共同点了！当需要使用 top types 时，我们在绝大多数情况下需要的都会是 `unknown` 而不是 `any`。
+同样是上面的例子，当使用 `unknown` 取代 `any` 之后，TypeScript 正确地提供了类型错误，让我们在使用 `value` 之前先确定好它的具体类型。从这个角度来说，`unknown` 远比 `any` 更加切合需求。事实上，除了「[都是 top types](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%80%BC%E7%9A%84%E9%9B%86%E5%90%88)」这一点外，`unknown` 和 `any` 几乎没有任何共同点了！当需要使用 top types 时，我们在绝大多数情况下需要的都会是 `unknown` 而不是 `any`。
 
 TypeScript 自带的类型库，特别是 `JSON.parse` 和 `fetch.json()` 的返回值都使用了 `any` 类型，饱受许多人的诟病。一些[工具类型库](https://github.com/total-typescript/ts-reset)会将它们修补为 `unknown` 类型。
 
@@ -861,7 +861,7 @@ const myObject = {
 } as MyObject;
 ```
 
-正如[值是类型的集合](TODO)提到的，downcast 不是一种安全的操作，但是 `as` 会让 TypeScript 忽略这个问题，毕竟这个功能叫「断言（assertion）」。如果我们将这样的 `myObject` 传给其它参数，我们很可能在运行时会遇到报错，完全放弃了 TypeScript 能够提供的类型检查能力。
+正如[值是类型的集合](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%80%BC%E7%9A%84%E9%9B%86%E5%90%88)提到的，downcast 不是一种安全的操作，但是 `as` 会让 TypeScript 忽略这个问题，毕竟这个功能叫「断言（assertion）」。如果我们将这样的 `myObject` 传给其它参数，我们很可能在运行时会遇到报错，完全放弃了 TypeScript 能够提供的类型检查能力。
 
 > 尽管如此，类型断言还是会在程序员尝试将类型转化为不兼容的类型时抛错，例如：
 >
@@ -896,9 +896,9 @@ getElementById(elementId: string): HTMLElement | null;
 
 类似这种返回值类型包含空值类型，程序员却通过类型断言忽视掉的问题甚至有可能造成 eslint 这类工具的误判。在我所在的团队中，近期发生了数个 Oncall 缺陷，它们的原因相同：eslint 认为某些使用了类型断言的变量（例如 `const foo = ... as Foo`）不可能包含空值，所以将引用了 `foo` 的 optional chain 去掉了（例如将 `foo?.bar()` 改为了 `foo.bar()`）。
 
-一个可能的解决方法是：使用 `as HTMLCanvasElement | null`。但它不是一个[可扩展](TODO)的办法：如果这个函数发生了修改，返回了其它类型的元素，或者会返回 `undefined` 而不是 `null`，那么我们使用的类型断言很可能不会产生任何报错，类型错误又逃逸到了运行时中。
+一个可能的解决方法是：使用 `as HTMLCanvasElement | null`。但它不是一个[可扩展](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E7%9A%84)的办法：如果这个函数发生了修改，返回了其它类型的元素，或者会返回 `undefined` 而不是 `null`，那么我们使用的类型断言很可能不会产生任何报错，类型错误又逃逸到了运行时中。
 
-说到这里，我很倾向于告诉大家 **不要使用任何类型断言**，因为我几乎想不到它的任何安全的使用价值，除了[我们在名义类型中看到的用法](TODO)，以及作为某些细分场景下不得已的 workaround。如果你真的遇到了需要使用类型断言的场景，那么这说明你使用的 API 有问题，应该从源头修复问题而不是在另一端假装自己避开了问题。正如我们看到的，类型断言很容易成为一种掩耳盗铃的、自欺欺人的手段。
+说到这里，我很倾向于告诉大家 **不要使用任何类型断言**，因为我几乎想不到它的任何安全的使用价值，除了[我们在名义类型中看到的用法](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%90%8D%E4%B9%89%E7%B1%BB%E5%9E%8Bnominal-typing)，以及作为某些细分场景下不得已的 workaround。如果你真的遇到了需要使用类型断言的场景，那么这说明你使用的 API 有问题，应该从源头修复问题而不是在另一端假装自己避开了问题。正如我们看到的，类型断言很容易成为一种掩耳盗铃的、自欺欺人的手段。
 
 > [!NOTE]
 > 就上面的 `getElementById()` 来说，我认为它的类型定义应该被修改为：
@@ -935,9 +935,9 @@ doSomething(otherModule.api.foo as string);
 
 就这个例子来说，问题的直接原因是：我们为 `API` 的泛型参数提供了默认值，导致用户可以「偷懒」地忽略对泛型参数的指定；根本原因则是：我们没有独立地看待实例化后的泛型类型。
 
-[后文](TODO)会详细讨论泛型，不过目前我们只需要知道：带泛型的类型一旦被实例化（被赋予具体的类型）之后会成为一个新的类型。换言之，`API<X>` 和 `API`（由默认值等价于 `API<unknown>`）不应该被视为相同的类型，即使有时候后者可以被赋给前者。
+[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter3.md#%E6%B3%9B%E5%9E%8Bgenerics)会详细讨论泛型，不过目前我们只需要知道：带泛型的类型一旦被实例化（被赋予具体的类型）之后会成为一个新的类型。换言之，`API<X>` 和 `API`（由默认值等价于 `API<unknown>`）不应该被视为相同的类型，即使有时候后者可以被赋给前者。
 
-`OtherModule` 的构造函数中 `api` 的类型被定义为 `API` 就是一个根本性的错误，但是即便我们通过去掉 `API` 的泛型默认值，也不能得到一个[可扩展](TODO)的解决方案。所有需要共享 `API<string>` 类型的地方都需要手动地指定 `string` 作为 `T` 的类型，而一旦后续决定不再使用 `string` 类型，则需要花费很大力气修改代码。
+`OtherModule` 的构造函数中 `api` 的类型被定义为 `API` 就是一个根本性的错误，但是即便我们通过去掉 `API` 的泛型默认值，也不能得到一个[可扩展](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%9B%AE%E7%9A%84)的解决方案。所有需要共享 `API<string>` 类型的地方都需要手动地指定 `string` 作为 `T` 的类型，而一旦后续决定不再使用 `string` 类型，则需要花费很大力气修改代码。
 
 一个可能的解决方案是：为 `API<string>` 类型提供别名，尊重「它已经是一个新类型」的事实。就像下面这样：
 
@@ -1055,7 +1055,7 @@ type TypeB = { a: TypeA } & { baz: number };
 //   ^? type TypeB = { a: TypeA } & { baz: number }
 ```
 
-我们可以使用名义类型中[阻止 Type Alias Preservation](TODO) 的技巧，编写下面这样的工具类型。
+我们可以使用名义类型中[阻止 Type Alias Preservation](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E9%98%BB%E6%AD%A2-type-alias-preservation) 的技巧，编写下面这样的工具类型。
 
 ```typescript
 export type Prettify<T> = {
@@ -1082,7 +1082,7 @@ type TypeB = Prettify<{ a: TypeA } & { baz: number }>;
 
   或许是一种可行的方案。用户需要手动检查返回值是否为 `null`，从而知道自己是否传入了非法的参数。不过，如果我们的函数不是 `last`，而是一些没有办法提供有意义的特殊返回值的函数（特别是一些存在复杂的副作用逻辑的函数），这个方法就行不通了。
 
-顺着在[名义类型](TODO)中的讨论，我们提出另外一种解决思路：不允许用户输入空数组。这样，我们就将输入合法性的问题从函数的实现方转嫁给了调用方，从某种程度上说这样是更合理的，就像你不能向汽车油箱里加入茅台咖啡一样，那是 API 使用者的责任而不是提供者的责任。
+顺着在[名义类型](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%90%8D%E4%B9%89%E7%B1%BB%E5%9E%8Bnominal-typing)中的讨论，我们提出另外一种解决思路：不允许用户输入空数组。这样，我们就将输入合法性的问题从函数的实现方转嫁给了调用方，从某种程度上说这样是更合理的，就像你不能向汽车油箱里加入茅台咖啡一样，那是 API 使用者的责任而不是提供者的责任。
 
 在下面的例子中，用户必须先通过 `isNonEmptyArray` 检查它们的数组是否非空数组，然后才能调用 `last`。
 
@@ -1165,7 +1165,7 @@ const admins = db.filterUsers(function () {
 
 ### 调用类型的函数
 
-如果你检查过 `keyof string` 这个类型里面有什么，你会发现它会包含字符串对象里面的各种属性名。类型系统为各种基础类型都提供了它的实例通过原型链获得的可访问的属性。其中，类型系统还会将一些类型的个别属性具化为有用的字面量类型，[正如我们在元组中看到的那样](TODO)。
+如果你检查过 `keyof string` 这个类型里面有什么，你会发现它会包含字符串对象里面的各种属性名。类型系统为各种基础类型都提供了它的实例通过原型链获得的可访问的属性。其中，类型系统还会将一些类型的个别属性具化为有用的字面量类型，[正如我们在元组中看到的那样](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E5%90%8D%E4%B9%89%E7%B1%BB%E5%9E%8Bnominal-typing)。
 
 这里介绍一个关于 `valueOf` 的技巧。我们可以通过取得这个函数的返回值类型来获得字面量类型对应的父类型。
 

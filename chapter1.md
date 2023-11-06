@@ -221,7 +221,7 @@ const __: Vector1D = _2; // OK
 
 在 TypeScript 检查一个值是否可以被赋给（assign to）一个变量时，如果这个值的类型是变量类型的子类型，那么称这个过程为 upcast。例如将 `true` 赋给一个 `boolean` 类型的变量。根据里氏替换原则，这种 upcast 基本上是安全的，因此 TypeScript 不会对这种赋值语句做额外的要求。
 
-如果方向相反，变量的类型是值的子类型，这个过程则被称为 downcast。例如将 `{}` 赋给 `{ foo: string }`。这种赋值并不安全，因此 TypeScript 在进行类型检查时会报错。我们一般需要通过类型断言（type assertion）去告诉 TypeScript 我们十分肯定这件事情是正确的，不过这也成为了 `as` 被滥用的开端，在[后文](TODO)会展开讨论。
+如果方向相反，变量的类型是值的子类型，这个过程则被称为 downcast。例如将 `{}` 赋给 `{ foo: string }`。这种赋值并不安全，因此 TypeScript 在进行类型检查时会报错。我们一般需要通过类型断言（type assertion）去告诉 TypeScript 我们十分肯定这件事情是正确的，不过这也成为了 `as` 被滥用的开端，在[后文](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#%E6%BB%A5%E7%94%A8%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80type-assertion)会展开讨论。
 
 > [!WARNING]
 > **不推荐使用 any 类型！**
