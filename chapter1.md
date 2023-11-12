@@ -202,10 +202,7 @@ const _0: Vector1D = { x: 114, y: 514 };
 
 ```typescript
 const _1: Vector2D = { x: 114, y: 514 };
-const _2: Vector2D = { x: 114, y: 514 };
-
 const _: Vector1D = _1; // OK
-const __: Vector1D = _2; // OK
 ```
 
 > [!NOTE]
