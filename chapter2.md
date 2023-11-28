@@ -557,9 +557,7 @@ console.log(Registry.Foo);
 
 > 在 5.0 之前，如果一个枚举不包含计算成员，那么它可能也具有上述特性。
 
-这一特性带来了下面的一些有用的场景。
-
-#### 在模板字面量中使用枚举类型
+这一特性使得我们可以在模板字面量中使用枚举类型：
 
 ```typescript
 const enum MyEnum {
@@ -571,7 +569,7 @@ const enum MyEnum {
 type _0 = `${MyEnum}`;
 //   ^? type _0 = "foo" | "bar" | "baz"
 
-const enum AnotherEnum {
+enum AnotherEnum {
   Simple = 114,
   Complex = Math.random(),
 }
@@ -582,21 +580,70 @@ type _1 = `${AnotherEnum}`;
 // 所以最终计算得到的字符串类型为 string
 ```
 
-#### 精细的类型检查
+### 枚举成员的透明性（opaque）
 
-枚举成员的类型就是它被赋予的值的类型，比如下面的 `MyEnum` 的类型实际上等价于 `'foo' | 'bar' | 'baz'`。不过对于计算成员（computed member），它的类型一般不会是字面量类型，而是对应的父类型。
+许多人可能遇到过这样的场景：
 
 ```typescript
-const enum MyEnum {
-  Foo = "foo",
-  Bar = "bar",
-  Baz = "baz",
+enum MyEnum {
+  Foo = 'foo', Bar = 'bar', Baz = 'baz'
 }
 
-const _0: MyEnum = MyEnum.Bar; // OK
-const _1: MyEnum = "bar"; // OK
-const _2: MyEnum = "xxx"; // ERROR!
+declare function myFunction(value: MyEnum): void;
+
+// 我们希望用户可以这样传参：
+myFunction(MyEnum.Foo); // 编译通过
+
+// 我们也希望用户不必导入 MyEnum 就能传参
+myFunction('foo'); // 编译不通过 :(
 ```
+
+结合前文对枚举是联合类型的讨论，我们很容易认为函数参数中的 `MyEnum` 类型就是它的成员值的联合类型，即 `'foo' | 'bar' | 'baz'`，因此也就觉得 `myFunction('foo')` 的用法是符合道理的。然而，为什么 TypeScript 会报错呢？简单来说，[这是一个设计决策](https://github.com/microsoft/TypeScript/issues/17690#issuecomment-321319291)：TypeScript 的设计者希望枚举具备透明性（opaque），即枚举成员实际的值可以被修改却不会导致它的消费者出错，简单来说就是 TypeScript 不希望我们可以通过枚举的值去指代某个枚举成员，因为枚举的存在意义在于枚举成员的名字，而不是它的值，考虑下面的例子：
+
+```typescript
+enum MyEnum {
+  // 假如因为各种原因，我们去掉了 Foo，同时将 Bar 的值改为了 'foo'
+  Bar = 'foo', Baz = 'baz'
+}
+
+// 假如 TypeScript 允许我们这么做，我们就会无声无息地得到一个 bug：
+// 在修改 MyEnum 前，'foo' 指的是 MyEnum.Foo，而之后它却指代了 MyEnum.Bar
+myFunction('foo');
+
+function myFunction(value: MyEnum) {
+  switch(value) {
+    case MyEnum.Bar:
+      // 啊哦！原本会进入 MyEnum.Foo 的逻辑进到了这里，天知道会发生什么事情！
+  }
+}
+```
+
+在 TypeScript 中，枚举实际上是一种「合约（contract）」，即「大家不关心成员的值是什么，只关心成员的名字」。特别是当被编译为 JavaScript 代码之后，常值枚举成员的名字不再存在，取而代之的是它实际的值。这种合约就像是在编译期（依托类型系统）对运行时中的某种常量值的约定，就像我们经常使用常量变量来在项目中「分享」某段字符串字面量，从而防止消费者不小心打错常量的值导致程序出问题那样。
+
+一旦我们抛弃枚举的名字，试图使用枚举的值去指代枚举，那么我们很可能会在运行时中遇到类似上述的问题，此时枚举就失去了它存在的意义了。尽管你仍然可以[通过命名空间](https://www.typescriptlang.org/play?#code/HYQwtgpgzgDiDGEAEBZAngUWAVzEg3gFBIlIQAeMA9gE4AuS8VwUDAYlVUgLxIDkAM058A3MVIVq9Rs1ZIAQiBo9+AIyWjCAX0KEA9HqSAmNMBG1qkw48gDW1AFOqBZxMCwmoE8MwHdugELdAAxaBT80J00MZABVYABLZgAVKgBJYDoIGigIeDow4AAeQIA+FQAKcRJAsnI44AATKCRsYABrYCoAd2AkAH4kHKUAcwAuJECASh5sgAYkHuAIADd4wgGKEvK2zp6Q4AF4pCiB7mH8lo3dscn4sT8ApAAZEFYY4NSM7N5biOjY+MTku93CuYgyiqrag0mq0cuQev1BkgRocpjRCNkfn82mCkCs1spzlsdqQ9ucDkhxrCTv4gqFnuFsDAADYQDIAGguVwYvEu12AT3SWQeSAA2oEALpFeYVHmE+L83atHkSnE9HkAOkVHMiFOptIw5HgVOwpVpgQZrLomUyBqZ-LEuq1SmQAiqH2YSFKlKpIXgIBSzAA4tglKU0uFMjk6AALCBYXA9cJ9OXKqiqmlpaoQNBUARIAM8vg04AdEN8fmCxELPlk4Aq5208I8pMptPhfmZTPZ3PB-OC1pi5Q9PjhUM0ZDWx3O13uiClJATEDa6AAQk0TupI49wG9vpy6HDYAGUHdISgAhC0AJRxoYgMSEAboqAYO1AEb6gHh9NxIDo+milLr6QxMFgMAD6C5dbrLqur4xqW5ZqomyapkgpwQNBG6WI2Wa-C2bZCr8xaxvGtKwfBFi4NWUFprhaYIbgDZNiheYFnsOBUlSoz8L28QDv2Q6LoBY4TlO2CznwKh0VSYi+CS5ibgAajxR68CRYmWIRtYwSSeGbuauiWlSg62sA9pNDQVQ5JO049GRYCSdOUDRhOVAhKUwn6cA674WA8ocFQfQiEg54APIANKEA5OQAERCFQQUeTiJA+f5ui-Lg5gxHEHTxJuBBIG5DKKMoOiEBpWl2suSAOQATIZUkmWgiUQMlNCblZEw2XZuglU5VU1ZurmcBF0UBVUpVDBFkVDZFPVAA)或者对象字面量等方式来模拟可以被赋予字面量值的枚举，但我仍然不建议大家这么做。这种做法尽管能够提供更方便的 API，却也不可避免地带来了隐患。
+
+不过，故事到这里还没有结束。有些出人意料的是，我们确实可以直接将数字字面量赋值给数字枚举类型：
+
+```typescript
+enum MyEnum {
+  Foo, Bar, Baz
+}
+
+declare function myFunction(value: MyEnum): void;
+
+myFunction(MyEnum.Foo); // OK!
+myFunction(0); // OK! <-- WTF?
+```
+
+TypeScript 的这种「漏洞」其实是一个重要特性带来的副作用：数字枚举可以参与数学运算，就像下面的例子。
+
+```typescript
+const _1 = MyEnum.Foo | MyEnum.Bar; // OK
+const _2 = MyEnum.Foo * 2; // OK
+const _3 = MyEnum.Baz & 0; // OK
+```
+
+虽然[从 5.0 开始，只有数字枚举成员对应的值的字面量才能被赋给枚举](https://github.com/microsoft/TypeScript/pull/51561#issue-1451913116)，这依然没有解决上面提到的问题。特别地，我们还可能会因为调换枚举成员的顺序使得枚举成员的值发生改变，进而导致上述问题的出现，而这是一个更加可能犯的错误！我们或许又多了一个使用字符串枚举而不是数字枚举的理由。
 
 ## 名义类型（Nominal Typing）
 
