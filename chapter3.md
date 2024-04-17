@@ -726,6 +726,233 @@ if (validatorFn(_0)) {
 
 我们会在接下来的生产实践章节中介绍更多有关函数类型闭包的例子，进一步展现它的强大功能。
 
+### Homomorphic Mapped Types
+
+你或许听说过 TypeScript 有一种叫 [Mapped Types](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html) 的概念，它可以根据一个类型构造出另一个类型，具体的形式类似下面的代码，它展示了基于给定泛型参数 `C` 构造新的对象类型，这个对象类型的值类型用 `X` 表示。
+
+```typescript
+type HMT<C> = {
+  [K in C]: X;
+};
+```
+
+Homomorphic Mapped Types（简称“HMT”）指的是一类特殊的 Mapped Types：它们的 `C` 来自 `keyof T`。其中，`T` 是一个泛型参数。注意到 HMT 并没有对 `X` 做出约束。
+
+HMT 有许多相当有意思的特性，其中我们最常遇到的可能是：当 `T` 为原始类型（primitive type）时，HMT 总是返回它本身，就像下面的代码这样。
+
+```typescript
+type MyHMT<T> = {
+  [K in keyof T]: never; // 👈 基本上，将这个 never 改成其它类型，结果都不会变化
+};
+
+type _1 = MyHMT<1>;
+//   ^? type _1 = 1
+
+type _2 = MyHMT<boolean>;
+//   ^? type _2 = boolean
+
+type _3 = MyHMT<bigint>;
+//   ^? type _3 = bigint
+```
+
+此外，HMT 还有一些强大特性：
+
+- 如果 `T` 为联合类型，那么 HMT 会进行分配（distributive）运算：
+  ```typescript
+  type HMT<T> = { [P in keyof T]: F<T[P]> }
+  // 这里，HMT<A | B> 等价于 F<A> | F<B>
+  ```
+- 如果 `T` 为数组类型，那么 HMT 会对其中的元素类型进行计算，返回结果类型构成的数组类型：
+  ```typescript
+  type HMT<T> = { [P in keyof T]: F<T[P]> }
+  // 这里，HMT<A[]> 等价于 F<A>[]
+  ```
+- 如果 `T` 为元组类型，那么 HMT 会做类似数组的操作：
+  ```typescript
+  type HMT<T> = { [P in keyof T]: F<T[P]> }
+  // 这里，HMT<[A, B, C]> 等价于 [F<A>, F<B>, F<C>] 
+  ```
+
+接下来，我们来看一个 HMT 的使用例子：
+
+```typescript
+type Tuple = [key: string, value: unknown];
+
+type ToObject<T extends Tuple[]> = // TODO
+
+type Result = ToObject<[['foo', true], ['bar', 233]]>;
+// 🤔 如何将元组类型转换为对象类型：{ foo: true, bar: 233 }
+```
+
+笔者的思路分为两步：首先将元组中的键提取出来，作为联合类型 `'foo' | 'bar'`，这样我们就能使用 Mapped Types 通过 ``{ [K in 'foo' | 'bar']: ... }`` 来构造出最终的对象类型。至于如何从 `K` 得到对应的值类型，我们可以对原本的元组类型使用前文介绍过的分配式条件类型来进行匹配。
+
+```typescript
+type GetKeys<T extends Tuple[]> = { [P in keyof T]: T[P][0] }[number];
+// 根据上述 HMT 对元组计算的特性，GetKeys<[['foo', true], ['bar', 233]]> 等价于：
+// [ ['foo', true][0], ['bar', 233][0] ][number]，等价于：
+// [ 'foo', 'bar' ][number]，即 'foo' | 'bar"
+
+type ToObject<T extends Tuple[]> = {
+  [K in GetKeys<T>]:
+    T[number] extends infer U ? // 👈 T[number] 等价于 ['foo', true] | ['bar', 233]
+      U extends readonly [K, infer V] ? // 👈 通过分配式条件类型 U 检查它的键是不是 K
+        V
+      : never
+  : never;
+}
+```
+
+其实 `ToObject` 还有一种不使用 HMT 的解法，其中的原理可以见 [TypeScript 仓库中的讨论](https://github.com/microsoft/TypeScript/issues/55762)。
+
+```typescript
+type ToObject<T extends Tuple[]> =
+  { [P in keyof T & `${number}` as T[P][0]]: T[P][1] };
+//               👆 这里是必要的，从元组（数组）类型的属性中筛选出 '0' 和 '1' 键
+```
+
+### Reverse Mapped Types
+
+在大多数的情况下，我们使用 TypeScript 的方式都是：先编写出类型，再用它约束值。不过，就像前文介绍的约束检查的通用方法那样，我们也可以做到：先接受值，再基于值产生类型，然后反过来利用产生的类型去约束值。本节会介绍一种被称为 Reverse Mapped Types （下文简称“RMT”）的技巧，它也利用了这种思想，不过具体的形式和通用方法不同。
+
+#### 原理
+
+RMT 利用了函数泛型的一个事实：TypeScript 需要依据使用了泛型参数的值来推导泛型参数究竟应该是什么类型，就像我们在前文 Type Parameter Inference 中介绍的那样。
+
+注意下面的例子，我们通过修改函数参数的类型来让 `T` 被推导为了不同的类型。
+
+```typescript
+declare function foo<T>(obj: { values: T }): void;
+declare function bar<T>(obj: { values: [T] }): void;
+
+// 此时，T 被推导为 number[]
+foo({ values: [1] });
+
+// 此时，T 被推导为 [number]
+bar({ values: [1] });
+```
+
+一个想法是：能不能让 TypeScript 将 `T` 推导为对象类型，让它表现得像一个 `Map`，这样就可以存储一些特殊的类型信息，从而实现很多高级的类型功能。在下面的例子中，我们希望在传给 `check` 函数的对象字面量中，各个值对象里的 `fn` 函数的参数类型能够和 `value` 属性的类型关联起来。
+
+```typescript
+check({
+  foo: {
+    value: 233,
+    fn: value => {
+      // 希望 value 被推导为 number
+    }
+  },
+  bar: {
+    value: 'seele',
+    fn: value => {
+      // 希望 value 被推导为 string
+    }
+  }
+});
+```
+
+根据前文的讨论，我们其实可以让 `T` 被推导为类似下面这样的对象类型，这样我们就能够将 `fn` 的类型标注为 ``(value: T[propertyName] => void`` 从而实现想要的功能了。不过这里的 `propertyName` 要怎么取？换句话说，当我们把 `T` 作为了某种 `Map` 之后，怎么对它进行写入和读取呢？
+
+```typescript
+{
+  foo: number,
+  bar: string
+}
+```
+
+Reverse Mapped Types 通过 Mapped Types 来实现这一点，下面是它的其中一个形式。注意 `MyReverseMappedType` 必须是一个 Homomorphic Mapped Types。
+
+```typescript
+type MyReverseMappedType<T> = {
+  // 利用给定对象值的类型信息，构造和使用 T
+  [K in keyof T]: ...; // 利用 Mapped Types 构造最终的对象类型约束
+};
+
+declare function check<T>(obj: MyReverseMappedType<T>): void;
+
+// 检查对象字面量的类型，当检查不通过时会报 obj 参数存在类型错误
+check({ foo: 123 });
+```
+
+#### 例子的实现
+
+前文的 `fn` 的例子可以通过下面的代码实现。我们也许可以按下面的步骤理解其中发生的事情（尽管这不一定是 TypeScript 编译器实际的工作方式）：
+
+1. TypeScript 注意到 `MyReverseMappedType` 是一个 Mapped Types，然后注意到向 `check` 函数输入的参数是对象字面量 `{ foo: ..., bar: ... }`，具有两个属性。于是 `T` 会被尝试推导为某种对象类型，`keyof T` 会得到 `'foo' | 'bar'`。
+
+2. 在使用 `foo: { value: T[K], fn (value: T[K]) => void` 检查 `foo: { value: 233, fn: value => {}}` 时，TypeScript 会从 `233` 和 `value => {}` 这两个值中尝试弄清楚 `T[K]` 到底是什么。
+
+3. 最终，TypeScript 得出 `T[K]` 应该是 `number` 的结论，相当于向 `T` 这个 `Map` 写入了 `T['foo'] = number`。`fn: (value: T[K]) => void` 相当于从 `T` 这个 `Map` 中读取了 `T['foo']` 的内容，获得了 `number` 类型。类似的过程也发生在了 `bar` 上。
+
+```typescript
+type MyReverseMappedType<T> = {
+  [K in keyof T]: {
+    value: T[K],
+    fn: (value: T[K]) => void
+  }
+};
+
+declare function check<T>(obj: MyReverseMappedType<T>): void;
+
+check({
+  foo: {
+    value: 233,
+    fn: value => {
+      // value 确实是 number！
+    }
+  },
+  bar: {
+    value: 'seele',
+    fn: value => {
+      // value 确实是 string！
+    }
+  }
+})
+```
+
+将鼠标放到 `check` 调用上，我们会看到 `T` 被推导为了下图所示的对象类型。
+
+![](./assets/chapter3/check.png)
+
+#### 其它形式
+
+除了上面提到的 Homomorphic Mapped Types 形式，[Reverse Mapped Types 还存在一些不那么常见的形式](https://github.com/microsoft/TypeScript/pull/55811)：
+
+- 形如 `{ [P in K]: ... }` 的 Mapped Type，其中 `K` 为一个类型参数。
+- 形如 `{ [P in A | B]: ... }` 的 Mapped Type，其中 `A | B` 表示某种联合类型，并且它至少包含一个这样的类型：要么满足 Homomorphic Mapped Type 的条件，要么满足上面第 1 种的条件。
+  > 这种形式可以被用来确保 TypeScript 推导出的 RMT 必须包含某些键，或者说属性。
+- [`5.4+`](https://github.com/microsoft/TypeScript/pull/55811) 形如 `{ [P in A & B]: ... }` 的 Mapped Type，其中 `A & B` 表示某种交叉类型，并且它的结果要么满足 Homomorphic Mapped Type 的条件，要么满足上面第 1 种的条件。
+  > 这种形式可以被用来确保 TypeScript 推导出的 RMT 不能包含某些键，或者说属性。
+
+这里特别介绍一下上述第 3 种形式的用处，请看下面的代码：
+
+```typescript
+declare function foo<T>(input: { [K in keyof T]: () => T[K] }): void;
+
+// 是否有办法在使用 RMT 的同时，让用户能且只能传入 foo、bar 属性？
+foo({ 
+  foo: () => 1,
+  bar: () => 'a',
+  extra: () => 123,
+});
+```
+
+你可能会想，这可以通过引入一个 `interface Params { foo: () => number; bar: () => string }` 并让 `foo<T extends Params>` 实现。但正如 `extends` 关键字所暗示的，我们向对象类型中附加更多属性的时候，会得到一个子类型，这是满足 `extends` 的约束的。此外，我们前文的一个类似的例子是通过直接将类型约束放置在参数上实现的，不适用于 RMT 的场景。
+
+事实上，可以使用 RMT 的交叉类型实现这种约束。
+
+```typescript
+declare function foo<T>(input: { [K in keyof T & ('foo' | 'bar')]: () => T[K] }): void;
+
+foo({ 
+  foo: () => 1,
+  bar: () => 'a',
+  extra: () => 123,
+  // TS 提出了正确的报错：Object literal may only specify known properties,
+  //   and 'extra' does not exist in type '{ foo: () => number; bar: () => string; }'.(2353)
+});
+// 此时，T 被推导为：{ foo: number; bar: string; }
+```
+
 ---
 
 | **上一章** | **目录** | **下一章** |

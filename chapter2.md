@@ -324,6 +324,27 @@ const _4 = concat([1] as const, ["foo"] as const);
 
 这样，我们就能在用户传入元组时得到元组类型，而不是数组类型。
 
+### [可选元素（Optional Element）](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#optional-elements-in-tuple-types) `3.0+`
+
+TypeScript 允许元组中存在可选元素，即这个元素可以存在也可以不存在。它主要被用来表示包含可选参数的函数，请看下面的例子。注意当 [`strictNullChecks`](https://www.typescriptlang.org/tsconfig#strictNullChecks) 配置被打开时，TypeScript 会向可选元素的类型中附加一个 `undefined` 类型形成联合类型。
+
+```typescript
+declare function foo(arg1?: string, arg2?: number): void;
+
+type _1 = Parameters<typeof foo>;
+//   ^? type _1 = [arg1?: string | undefined, arg2?: number | undefined]
+```
+
+可选元素的存在会导致元组类型的长度虽然固定但不唯一，请看下面的例子：
+
+```typescript
+type _1 = [number, string, boolean]['length'];
+//   ^? type _1 = 3
+
+type _2 = [number, string?, boolean?]['length'];
+//   ^? type _2 = 1 | 2 | 3
+```
+
 ### 工具函数 `asTuple` `5.0+`
 
 我们还能够扩展上述的 `concat` 函数，注意其中的变量 `_1`、`_2` 和 `_4`，为什么非得使用 `as const` 才能让 TypeScript 推导出字面量类型呢？实际上，我们可以通过 [`const` 类型参数（`const` type parameters）](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter2.md#const-%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0const-type-parameters-50) `5.0+` 来改进这一点，让用户无需使用 `as const` 就能让 TypeScript 推导出元组字面量类型：
@@ -908,7 +929,7 @@ const myObject = {
 } as MyObject;
 ```
 
-正如[值是类型的集合](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%80%BC%E7%9A%84%E9%9B%86%E5%90%88)提到的，downcast 不是一种安全的操作，但是 `as` 会让 TypeScript 忽略这个问题，毕竟这个功能叫「断言（assertion）」。如果我们将这样的 `myObject` 传给其它参数，我们很可能在运行时会遇到报错，完全放弃了 TypeScript 能够提供的类型检查能力。
+正如[类型是值的集合](https://github.com/darkyzhou/You-Might-Not-Know-TypeScript/blob/main/chapter1.md#%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%80%BC%E7%9A%84%E9%9B%86%E5%90%88)提到的，downcast 不是一种安全的操作，但是 `as` 会让 TypeScript 忽略这个问题，毕竟这个功能叫「断言（assertion）」。如果我们将这样的 `myObject` 传给其它参数，我们很可能在运行时会遇到报错，完全放弃了 TypeScript 能够提供的类型检查能力。
 
 > 尽管如此，类型断言还是会在程序员尝试将类型转化为不兼容的类型时抛错，例如：
 >
@@ -1001,6 +1022,158 @@ doSomething(otherModule.api.foo); // 不再需要类型断言！
 ```
 
 总的来说，一旦需要复用某些类型（特别是实例化后的泛型类型），我们都需要使用类型别名让这种类型称为一种「权威」，一种可供后续代码直接复用的东西。这些代码不应该承担「应该如何实例化泛型类型」的职责。
+
+### 慎用 Type Predicate
+
+我们在前文类型具化中提到，可以使用 Type Predicates 来手动具化类型，就像下面的代码这样：
+
+```typescript
+declare function isNumber(input: unknown): input is number;
+
+declare const someValue: unknown;
+if (isNumber(someValue)) {
+  // 此时，someValue 的类型被具化为 number
+}
+```
+
+Type Predicates 其实是一种和类型断言类似的强制性手段，尽管它确实存在运行时的检查能够保障这种断言的正确性，不过我们必须注意：这只是一种快照式的保障，它只能确保给定的值在输入函数的那一刻是某种类型，它不总能确保它在之后仍然是这种类型。请看下面的例子：
+
+```typescript
+declare function isArrayOfSingleNumber(array: unknown[]): array is [number];
+
+declare const myArray: unknown[];
+if (isArrayOfSingleNumber(myArray)) {
+  // myArray 现在确实是 [number] 了
+
+  // 😈 做点坏事！
+  myArray.push(2);
+
+  // 呃……myArray 现在的类型仍然是 [number]，尽管我们都知道它应该是 [number, number] 了
+}
+```
+
+对于数组和对象这类能够就地（in-place）修改数据的类型来说，我们可能通过这些修改而导致它的类型不再和 Type Predicates 具化为的类型一致，从而可能引发和类型断言一样的问题。从这点上看，Type Predicates 除非被用在原始类型上，否则它至少和类型断言同等危险，尤其是许多人都以为它能够在运行时进行检查于是就将它作为一种安全的手段而放松了警惕。因此，在使用类型断言时需要特别注意检查后的值是否会从原本的类型空间迁移出去。
+
+就数组和对象来说，我们可以修改 Type Predicate 的返回值类型为只读（readonly）类型，这样就可以避免用户后续再对它做出修改，就像下面的代码：
+
+```typescript
+// 👇 注意新增的 readonly 关键字
+declare function isArrayOfSingleNumber(array: unknown[]): array is readonly [number];
+
+if (isArrayOfSingleNumber(myArray)) {
+  // 👿 怎么编译不通过了，原来是因为 ReadonlyArray 类型没有 push 函数！
+  myArray.push(2);
+}
+```
+
+在本节末尾，我想额外讨论一个我讨厌 Type Predicate 的原因：*它对 API 提供者自己来说也不是安全的*。
+
+笔者最近在编写幻灯片的动画播放控制功能，我提供了一个时间线抽象来承载需要先后按顺序触发的动画，在时间线上，我们有两种不同的步骤，一种位于时间线的两个端点，用于标识时间线的界限；另一种位于端点之间，用于标识各种动画的执行。这两种步骤包含不同的信息，其中后者会包含一个 `index` 属性用于区分它们之间的相对顺序，就像下面的代码：
+
+```typescript
+// 位于端点的步骤类型
+export interface BoundaryStep {
+  kind: 'initial' | 'final';
+}
+
+// 位于端点之间的步骤类型
+export interface ActionStep {
+  kind: 'leading' | 'gap' |  'ending' | 'formal';
+  index: number;
+}
+
+// 它们构成的联合类型
+export type AnimationTimelineStep = BoundaryStep | ActionStep;
+```
+
+现在，给定一个 `AnimationTimelineStep` 类型的值，我的代码需要能够区分这两种不同类型的步骤。我们自然而然地想到可以提供一个 Type Predicate 来完成这件事，就像下面的代码：
+
+```typescript
+export function isBoundaryStep(step: AnimationTimelineStep): step is BoundaryStep {
+  return step.kind === 'initial' || step.kind === 'final';
+}
+```
+
+这似乎是个可行的方案，只是给 API 提供者带来了一个问题：如果后续 `BoundaryStep` 的 `kind` 新增了一些情况，又或者我们把 `'initial'` 的情况搬到了另一种步骤类型，那么这个 Type Predicate 不会有任何编译错误，但它在运行时却不能正确地工作了。
+
+也许你会尝试将上述判据改为 `!('index' in step)`，但这是一个更加危险的做法：
+
+- `BoundaryStep` 未来可能也会引入一个 `index` 属性，届时你的判据会失效，但仍然编译通过。
+- `ActionStep` 未来可能会去掉 `index` 属性或者改名，届时你的判据也会失效，但仍然编译通过。
+
+总之，在这种情况下 Type Predicate 无法为你的判断条件提供充足的类型检查，这就是它尴尬的处境！它很难保证代码的正确性，无论是对 API 的用户还是作者而言皆如此。对于上面的例子，我想到了下面的两种解决办法，但他们无一不带来了额外的问题，很难称得上实用且安全。
+
+```typescript
+// 方案一：转向 class
+export class BoundaryStep {
+  constructor(
+    readonly kind: 'initial' | 'final'
+  ) {}
+}
+
+export class ActionStep {
+  constructor(
+    readonly kind: 'leading' | 'gap' |  'ending' | 'formal',
+    readonly index: number,
+  ) {}
+}
+
+declare const someStep: AnimationTimelineStep;
+
+// 这样，我们就可以通过 instanceof 来安全地判断究竟是哪个类型了
+if (someStep instanceof BoundaryStep) {
+  // ...
+}
+
+// 😭 可是，用户被迫地需要使用构造函数来创建实例
+// 通过函数传参的方式构造对象实例并不直观，而且不安全：
+// 函数参数调换位置或发生其他改变时，调用它的用户可能不会产生编译错误
+const myStep = new ActionStep('leading', 0);
+```
+
+```typescript
+// 方案二：手动指定 Tag
+export interface BoundaryStep {
+  tag: 'boundary';
+  kind: 'initial' | 'final';
+}
+
+export interface ActionStep {
+  tag: 'action'
+  kind: 'leading' | 'gap' |  'ending' | 'formal';
+  index: number;
+}
+
+export function isBoundaryStep(step: AnimationTimelineStep): step is BoundaryStep {
+  return step.tag === 'boundary';
+}
+
+// 🙃 可是，用户以后创建实例时就必须带上奇怪的 tag，非常繁琐
+const myStep = { tag: 'action', kind: 'leading', index: 0 };
+```
+
+更好的解决方案通过引入特殊的构造方式和 API 来解决问题，这里推荐使用 [@practical-fp/union-types](https://www.npmjs.com/package/@practical-fp/union-types?activeTab=readme) 库。下面是一段解决了上述问题的代码。顺便说一句，这个库要求 TypeScript `4.2+` 版本。
+
+```typescript
+// 类似方案二的方式，不过它帮我们封装好了很多东西
+type AnimationTimelineStep =
+  | Variant<"BoundaryStep", { kind: 'initial' | 'final' }>
+  | Variant<"ActionStep", { kind: 'leading' | 'gap' |  'ending' | 'formal' }>
+
+// impl() 使用了 Proxy，如果你不喜欢可以改用 constructor()
+const { BoundaryStep, ActionStep } = impl<AnimationTimelineStep>()
+
+function doSomethingWithStep(step: AnimationTimelineStep) {
+  // 通过模式匹配来区分类型
+  return matchExhaustive(step, {
+    BoundaryStep: (...) => ...,
+    ActionStep: (...) => ...,
+  })
+}
+
+// 😘 相比之下，这种构造方式更加清晰直观！
+const circle = BoundaryStep({ kind: 'initial' })
+```
 
 ## 一些零碎的技巧
 
