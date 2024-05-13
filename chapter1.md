@@ -89,17 +89,6 @@ const a: MyInterface = "seele";
 const b: MyInterface = () => {};
 ```
 
-```typescript
-class Foo {
-  bar: string;
-  constructor(baz: string) {}
-}
-// 不报错！
-// 对象字面量也存在名为 `constructor` 的函数
-// 而且它的这个函数不接收参数，可以赋值给 Foo 的 `constructor`
-const a: Foo = { bar: "Hello" };
-```
-
 不过，结构化类型赋予了 TypeScript 的类型系统非常强大的功能，让我们可以通过编程的方式「组合」出自己想要的类型，这一点在后续的类型编程中会详细讨论。
 
 > [!NOTE]
